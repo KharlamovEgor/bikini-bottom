@@ -1,51 +1,62 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {Await, useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {Suspense} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
-import type {
-  FeaturedCollectionFragment,
-  RecommendedProductsQuery,
-} from 'storefrontapi.generated';
+import { defer, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { Await, useLoaderData, Link, type MetaFunction } from '@remix-run/react';
+import { Suspense } from 'react';
+import {
+  Image,
+  Money,
+  Pagination,
+  getPaginationVariables,
+} from '@shopify/hydrogen';
+import type { RecommendedProductsQuery } from 'storefrontapi.generated';
+import { ProductCard } from '~/components/ProductCard';
+import { Hero } from '~/components/Hero';
+import { GiftCard } from '~/components/GiftCard';
+import { Slider } from '~/components/Slider';
+import { BuyCard } from '~/components/BuyCard';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Hydrogen | Home'}];
+  return [{ title: 'CloClips | Home' }];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const variables = getPaginationVariables(args.request, {
+    pageBy: 4,
+  });
 
-  // Await the critical data required to render initial state of the page
+  const { products } = await args.context.storefront.query(ALL_PRODUCTS_QUERY, {
+    variables,
+  });
+
+  const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
 
-  return defer({...deferredData, ...criticalData});
+  const env = args.context.env;
+
+  return defer({
+    ...deferredData,
+    ...criticalData,
+    products,
+
+    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+  });
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
-async function loadCriticalData({context}: LoaderFunctionArgs) {
-  const [{collections}] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTION_QUERY),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
-
-  return {
-    featuredCollection: collections.nodes[0],
-  };
+async function loadCriticalData({ context }: LoaderFunctionArgs) {
+  // const [{collections}] = await Promise.all([
+  //   context.storefront.query(FEATURED_COLLECTION_QUERY),
+  //   // Add other queries here, so that they are loaded in parallel
+  // ]);
+  //
+  // return {
+  //   featuredCollection: collections.nodes[0],
+  // };
+  return {};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({context}: LoaderFunctionArgs) {
+function loadDeferredData({ context }: LoaderFunctionArgs) {
   const recommendedProducts = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
       console.error(error);
       return null;
     });
@@ -59,31 +70,34 @@ export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
+      <Slider />
+      <Pagination connection={data.products}>
+        {({ nodes, NextLink, PreviousLink, isLoading }) => (
+          <>
+            <PreviousLink>
+              {isLoading ? 'Loading...' : 'Load previous products'}
+            </PreviousLink>
+            <h2 className="new-collection__heading">
+              Friends forever collection
+            </h2>
+            <div className="new-collection-grid">
+              {nodes.map((product) => (
+                <BuyCard
+                  product={product}
+                  publicStoreDomain={data.publicStoreDomain}
+                />
+              ))}
+            </div>
+            <NextLink>
+              {isLoading ? 'Loading...' : 'Load next products'}
+            </NextLink>
+          </>
+        )}
+      </Pagination>
       <RecommendedProducts products={data.recommendedProducts} />
+      <Hero />
+      <GiftCard />
     </div>
-  );
-}
-
-function FeaturedCollection({
-  collection,
-}: {
-  collection: FeaturedCollectionFragment;
-}) {
-  if (!collection) return null;
-  const image = collection?.image;
-  return (
-    <Link
-      className="featured-collection"
-      to={`/collections/${collection.handle}`}
-    >
-      {image && (
-        <div className="featured-collection-image">
-          <Image data={image} sizes="100vw" />
-        </div>
-      )}
-      <h1>{collection.title}</h1>
-    </Link>
   );
 }
 
@@ -94,29 +108,15 @@ function RecommendedProducts({
 }) {
   return (
     <div className="recommended-products">
-      <h2>Recommended Products</h2>
+      <h2 className="recommended-products__heading">Best Sellers</h2>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
             <div className="recommended-products-grid">
               {response
                 ? response.products.nodes.map((product) => (
-                    <Link
-                      key={product.id}
-                      className="recommended-product"
-                      to={`/products/${product.handle}`}
-                    >
-                      <Image
-                        data={product.images.nodes[0]}
-                        aspectRatio="1/1"
-                        sizes="(min-width: 45em) 20vw, 50vw"
-                      />
-                      <h4>{product.title}</h4>
-                      <small>
-                        <Money data={product.priceRange.minVariantPrice} />
-                      </small>
-                    </Link>
-                  ))
+                  <ProductCard product={product} />
+                ))
                 : null}
             </div>
           )}
@@ -126,29 +126,6 @@ function RecommendedProducts({
     </div>
   );
 }
-
-const FEATURED_COLLECTION_QUERY = `#graphql
-  fragment FeaturedCollection on Collection {
-    id
-    title
-    image {
-      id
-      url
-      altText
-      width
-      height
-    }
-    handle
-  }
-  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...FeaturedCollection
-      }
-    }
-  }
-` as const;
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   fragment RecommendedProduct on Product {
@@ -173,10 +150,72 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }
     }
   }
 ` as const;
+
+const PRODUCT_ITEM_FRAGMENT = `#graphql
+  fragment MoneyProductItem on MoneyV2 {
+    amount
+    currencyCode
+  }
+  fragment ProductItem on Product {
+    variants(first: 8) {
+      nodes {
+        id
+      }
+    }
+    id
+    handle
+    title
+    featuredImage {
+      id
+      altText
+      url
+      width
+      height
+    }
+    priceRange {
+      minVariantPrice {
+        ...MoneyProductItem
+      }
+      maxVariantPrice {
+        ...MoneyProductItem
+      }
+    }
+    variants(first: 1) {
+      nodes {
+        selectedOptions {
+          name
+          value
+        }
+      }
+    }
+  }
+` as const;
+
+const ALL_PRODUCTS_QUERY = `#graphql
+  query AllProducts(
+    $first: Int
+    $last: Int
+    $startCursor: String
+    $endCursor: String
+  ) {
+    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+      nodes {
+        ...ProductItem
+      }
+      pageInfo {
+        hasPreviousPage
+        hasNextPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+  ${PRODUCT_ITEM_FRAGMENT}
+`;
