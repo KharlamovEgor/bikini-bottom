@@ -1,0 +1,64 @@
+.search {}
+
+.wrapper {
+  left: 0;
+  width: 100%;
+  top: 100%;
+  position: absolute;
+  background: white;
+  box-shadow: 0 10px 20px #00000017;
+  border-top: 1px solid #000;
+  transition: all 0.3s ease-out;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.opened {
+  visibility: visible;
+  opacity: 1;
+}
+
+div.container {
+  margin-top: 3em;
+  margin-bottom: 3em;
+}
+
+.form {
+  background-color: hsla(0, 0%, 23%, 0.1);
+  padding: 1em;
+  border-radius: 30px;
+  margin-bottom: 3em;
+  position: relative;
+  font-size: 0.5rem;
+
+  @media (min-width: 45em) {
+    font-size: 1rem;
+  }
+}
+
+.form::after {
+  content: '';
+  background: url('../../assets/images/searh.svg');
+  width: 2em;
+  height: 2em;
+  background-size: 2em;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 8%;
+}
+
+.form input {
+  border: none;
+  outline: none;
+  padding: 0.5em;
+  border-radius: 20px;
+  width: 100%;
+  font-size: 0.75rem;
+  margin: 0;
+  padding-right: 3em;
+
+  @media (min-width: 45em) {
+    font-size: 1.5rem;
+  }
+}

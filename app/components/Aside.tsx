@@ -1,31 +1,6 @@
-import {createContext, type ReactNode, useContext, useState} from 'react';
+import {createContext, useContext, useState} from 'react';
 
-type AsideType = 'search' | 'cart' | 'mobile' | 'closed';
-type AsideContextValue = {
-  type: AsideType;
-  open: (mode: AsideType) => void;
-  close: () => void;
-};
-
-/**
- * A side bar component with Overlay
- * @example
- * ```jsx
- * <Aside type="search" heading="SEARCH">
- *  <input type="search" />
- *  ...
- * </Aside>
- * ```
- */
-export function Aside({
-  children,
-  heading,
-  type,
-}: {
-  children?: React.ReactNode;
-  type: AsideType;
-  heading: React.ReactNode;
-}) {
+export function Aside({children, heading, type}) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
 
@@ -49,10 +24,10 @@ export function Aside({
   );
 }
 
-const AsideContext = createContext<AsideContextValue | null>(null);
+const AsideContext = createContext(null);
 
-Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
-  const [type, setType] = useState<AsideType>('closed');
+Aside.Provider = function AsideProvider({children}) {
+  const [type, setType] = useState('closed');
 
   return (
     <AsideContext.Provider

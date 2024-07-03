@@ -5,19 +5,28 @@ import {
   useOptimisticCart,
   type OptimisticCart,
 } from '@shopify/hydrogen';
-import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
-import {Link} from '@remix-run/react';
-import type {CartApiQueryFragment} from 'storefrontapi.generated';
-import {useVariantUrl} from '~/lib/variants';
+import type {
+  CartLineUpdateInput,
+  Product,
+} from '@shopify/hydrogen/storefront-api-types';
+import { Link } from '@remix-run/react';
+import type { CartApiQueryFragment } from 'storefrontapi.generated';
+import { useVariantUrl } from '~/lib/variants';
+import classNames from 'classnames';
+import styles from './Cart.module.css';
+import { Heading } from './Heading/Heading';
+import { BuyCard } from './BuyCard';
+import { ScrollGrid } from './ScrollGrid/ScrollGrid';
+import { Grid } from './Grid/Grid';
 
 type CartLine = OptimisticCart<CartApiQueryFragment>['lines']['nodes'][0];
 
 type CartMainProps = {
   cart: CartApiQueryFragment | null;
-  layout: 'page' | 'aside';
+  recommended: any;
 };
 
-export function CartMain({layout, cart: originalCart}: CartMainProps) {
+export function CartMain({ cart: originalCart, recommended }: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
@@ -27,149 +36,111 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
 
   return (
-    <div className={className}>
-      <CartEmpty hidden={linesCount} layout={layout} />
-      <CartDetails cart={cart} layout={layout} />
+    <div className={classNames(className, styles.cart)}>
+      <CartEmpty hidden={linesCount} recommended={recommended} />
+      <CartDetails hidden={linesCount} cart={cart} recommended={recommended} />
     </div>
   );
 }
 
 function CartDetails({
-  layout,
   cart,
+  recommended,
+  hidden,
 }: {
   cart: OptimisticCart<CartApiQueryFragment>;
-  layout: 'page' | 'aside';
+  recommended: Product[];
+  hidden: boolean;
 }) {
-  const cartHasItems = !!cart && cart.totalQuantity > 0;
-
   return (
-    <div className="cart-details">
-      <CartLines lines={cart?.lines?.nodes} layout={layout} />
-      {cartHasItems && (
-        <CartSummary cost={cart.cost} layout={layout}>
-          <CartDiscounts discountCodes={cart.discountCodes} />
-          <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
+    <div className={classNames({ [styles.hidden]: !hidden })}>
+      <Heading>Cart</Heading>
+      <div className={styles.cartDetails}>
+        <CartLines lines={cart?.lines?.nodes} />
+        <CartSummary cost={cart?.cost}>
+          <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
+          <Link to="/collections/all">Continue shopping</Link>
         </CartSummary>
-      )}
+        <div className={styles.recommendedProducts}>
+          <Heading>Recommended products</Heading>
+          <ScrollGrid>
+            {recommended?.map((product) => (
+              <BuyCard key={product.id} product={product} small={true} />
+            ))}
+          </ScrollGrid>
+        </div>
+      </div>
     </div>
   );
 }
 
-function CartLines({
-  lines,
-  layout,
-}: {
-  layout: CartMainProps['layout'];
-  lines: CartLine[];
-}) {
+function CartLines({ lines }: { lines: CartLine[] }) {
   if (!lines) return null;
 
   return (
     <div aria-labelledby="cart-lines">
       <ul>
         {lines.map((line) => (
-          <CartLineItem key={line.id} line={line} layout={layout} />
+          <CartLineItem key={line.id} line={line} />
         ))}
       </ul>
     </div>
   );
 }
 
-function CartLineItem({
-  layout,
-  line,
-}: {
-  layout: CartMainProps['layout'];
-  line: CartLine;
-}) {
-  const {id, merchandise} = line;
-  const {product, title, image, selectedOptions} = merchandise;
+function CartLineItem({ line }: { line: CartLine }) {
+  const { id, merchandise } = line;
+  const { product, title, image, selectedOptions } = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
 
   return (
-    <li key={id} className="cart-line">
-      {image && (
-        <Image
-          alt={title}
-          aspectRatio="1/1"
-          data={image}
-          height={100}
-          loading="lazy"
-          width={100}
-        />
-      )}
+    <li key={id} className={styles.cartLine}>
+      {image && <Image alt={title} data={image} loading="lazy" width={150} />}
 
-      <div>
-        <Link
-          prefetch="intent"
-          to={lineItemUrl}
-          onClick={() => {
-            if (layout === 'aside') {
-              // close the drawer
-              window.location.href = lineItemUrl;
-            }
-          }}
-        >
-          <p>
-            <strong>{product.title}</strong>
-          </p>
-        </Link>
+      <div className={styles.cartLineMain}>
+        <div className={styles.cartData}>
+          <Link prefetch="intent" to={lineItemUrl}>
+            <span className={styles.productTitle}>{product.title}</span>
+          </Link>
+          <CartLineQuantity line={line} />
+        </div>
+
         <CartLinePrice line={line} as="span" />
-        <ul>
-          {selectedOptions.map((option) => (
-            <li key={option.name}>
-              <small>
-                {option.name}: {option.value}
-              </small>
-            </li>
-          ))}
-        </ul>
-        <CartLineQuantity line={line} />
       </div>
     </li>
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
+function CartCheckoutActions({ checkoutUrl }: { checkoutUrl: string }) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
-      </a>
-      <br />
-    </div>
+    <a href={checkoutUrl} target="_self">
+      Check out
+    </a>
   );
 }
 
 export function CartSummary({
   cost,
-  layout,
   children = null,
 }: {
   children?: React.ReactNode;
   cost: CartApiQueryFragment['cost'];
-  layout: CartMainProps['layout'];
 }) {
-  const className =
-    layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
-
   return (
-    <div aria-labelledby="cart-summary" className={className}>
-      <h4>Totals</h4>
-      <dl className="cart-subtotal">
-        <dt>Subtotal</dt>
-        <dd>
+    <div aria-labelledby="cart-summary" className={styles.cartTotals}>
+      <div className={styles.cartSubtotals}>
+        <div>Subtotal</div>
+        <div>
           {cost?.subtotalAmount?.amount ? (
             <Money data={cost?.subtotalAmount} />
           ) : (
             '-'
           )}
-        </dd>
-      </dl>
-      {children}
+        </div>
+      </div>
+      <div className={styles.links}>{children}</div>
     </div>
   );
 }
@@ -185,47 +156,49 @@ function CartLineRemoveButton({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesRemove}
-      inputs={{lineIds}}
+      inputs={{ lineIds }}
     >
-      <button disabled={disabled} type="submit">
+      <button disabled={disabled} className={styles.removeButton} type="submit">
         Remove
       </button>
     </CartForm>
   );
 }
 
-function CartLineQuantity({line}: {line: CartLine}) {
+function CartLineQuantity({ line }: { line: CartLine }) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity, isOptimistic} = line;
+  const { id: lineId, quantity, isOptimistic } = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
     <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <button
-          aria-label="Decrease quantity"
-          disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
-        >
-          <span>&#8722; </span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-        <button
-          aria-label="Increase quantity"
-          name="increase-quantity"
-          value={nextQuantity}
-          disabled={!!isOptimistic}
-        >
-          <span>&#43;</span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+      <div className={styles.cartLineButtons}>
+        <div className={styles.quatityControll}>
+          <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
+            <button
+              aria-label="Decrease quantity"
+              disabled={quantity <= 1 || !!isOptimistic}
+              name="decrease-quantity"
+              value={prevQuantity}
+            >
+              <span>&#8722; </span>
+            </button>
+          </CartLineUpdateButton>
+          <span>{quantity}</span>
+          <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
+            <button
+              aria-label="Increase quantity"
+              name="increase-quantity"
+              value={nextQuantity}
+              disabled={!!isOptimistic}
+            >
+              <span>&#43;</span>
+            </button>
+          </CartLineUpdateButton>
+        </div>
+        <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+      </div>
     </div>
   );
 }
@@ -240,19 +213,19 @@ function CartLinePrice({
   [key: string]: any;
 }) {
   if (!line?.cost?.amountPerQuantity || !line?.cost?.totalAmount)
-    return <div style={{visibility: 'hidden'}}>&nbsp;</div>;
+    return <div style={{ visibility: 'hidden' }}>&nbsp;</div>;
 
   const moneyV2 =
     priceType === 'regular'
-      ? line.cost.totalAmount
-      : line.cost.compareAtAmountPerQuantity;
+      ? line.cost?.totalAmount
+      : line.cost?.compareAtAmountPerQuantity;
 
   if (moneyV2 == null) {
-    return <div style={{visibility: 'hidden'}}>&nbsp;</div>;
+    return <div style={{ visibility: 'hidden' }}>&nbsp;</div>;
   }
 
   return (
-    <div>
+    <div className={styles.price}>
       <Money withoutTrailingZeros {...passthroughProps} data={moneyV2} />
     </div>
   );
@@ -260,29 +233,30 @@ function CartLinePrice({
 
 export function CartEmpty({
   hidden = false,
-  layout = 'aside',
+  recommended,
 }: {
   hidden: boolean;
-  layout?: CartMainProps['layout'];
+  recommended: Product[];
 }) {
   return (
-    <div hidden={hidden}>
-      <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
-      </p>
-      <br />
-      <Link
-        to="/collections"
-        onClick={() => {
-          if (layout === 'aside') {
-            window.location.href = '/collections';
-          }
-        }}
-      >
-        Continue shopping →
+    <div
+      className={classNames(styles.cartEmpty, {
+        [styles.hidden]: hidden,
+      })}
+    >
+      <Heading>Cart</Heading>
+      <p className={styles.emptyMessage}>Your cart is currently empty.</p>
+      <Link className={styles.continueButton} to="/collections/all">
+        Continue shopping
       </Link>
+      <div className={styles.recommendedProducts}>
+        <Heading>Recommended products</Heading>
+        <Grid>
+          {recommended?.map((product) => {
+            return <BuyCard key={product.id} product={product} />;
+          })}
+        </Grid>
+      </div>
     </div>
   );
 }
@@ -295,7 +269,7 @@ function CartDiscounts({
   const codes: string[] =
     discountCodes
       ?.filter((discount) => discount.applicable)
-      ?.map(({code}) => code) || [];
+      ?.map(({ code }) => code) || [];
 
   return (
     <div>
@@ -318,7 +292,9 @@ function CartDiscounts({
         <div>
           <input type="text" name="discountCode" placeholder="Discount code" />
           &nbsp;
-          <button type="submit">Apply</button>
+          <button type="submit" className="submit-button">
+            Apply
+          </button>
         </div>
       </UpdateDiscountForm>
     </div>
@@ -356,7 +332,7 @@ function CartLineUpdateButton({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesUpdate}
-      inputs={{lines}}
+      inputs={{ lines }}
     >
       {children}
     </CartForm>

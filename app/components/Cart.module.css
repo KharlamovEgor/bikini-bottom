@@ -1,0 +1,142 @@
+.cart {
+  font-size: 1.2rem;
+}
+
+.cart p {
+  font-size: inherit;
+}
+
+.cartEmpty {
+  margin-top: 5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+}
+
+.hidden {
+  display: none;
+}
+
+.continueButton,
+.links a {
+  text-align: center;
+  display: block;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
+  color: white;
+  background-color: hsla(358, 100%, 78%, 1);
+  padding: 1.2em 1.7em;
+  border-radius: 100px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.1s linear;
+
+  &:hover {
+    background-color: hsla(358, 100%, 70%, 1);
+  }
+}
+
+.emptyMessage {
+  color: #3a3a3a;
+  font-weight: 400;
+}
+
+.recommendedProducts {
+  margin-top: 3em;
+}
+
+.recommendedProducts h2 {
+  margin-bottom: 1em;
+}
+
+.cartDetails {
+  display: grid;
+  column-gap: 5em;
+  row-gap: 2em;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'lines'
+    'products'
+    'links';
+
+  @media (min-width: 45em) {
+    grid-template-columns: 1fr 600px;
+    grid-template-areas: 'lines links' 'products -';
+  }
+}
+
+.cartTotals {
+  grid-area: links;
+  background-color: hsla(0, 0%, 23%, 0.03);
+  padding: 1.8em;
+  border-radius: 20px;
+}
+
+.cartSubtotals {
+  font-size: 1.6rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+
+.links a:first-child {
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.cartLine {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+
+.productTitle {
+  font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
+}
+
+.quatityControll {
+  margin-top: 1em;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  color: hsla(0, 0%, 23%, 1);
+}
+
+.quatityControll button {
+  border: none;
+  background: none;
+  color: hsla(0, 0%, 23%, 0.5);
+}
+
+.quatityControll * {
+  font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
+}
+
+.removeButton {
+  font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
+  color: hsl(0, 0%, 23%);
+  background: none;
+  border: none;
+}
+
+.cartLineButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.price {
+  font-weight: 600;
+  font-size: clamp(1rem, 0.7423rem + 1.0997vw, 2rem);
+}
+
+.cartLineMain {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  align-items: center;
+}
+
+.recommendedProducts h2 {
+  margin-bottom: 1em;
+}

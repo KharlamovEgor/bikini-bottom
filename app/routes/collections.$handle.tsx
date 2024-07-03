@@ -3,31 +3,27 @@ import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
 import {
   Pagination,
   getPaginationVariables,
+  Analytics,
   Image,
   Money,
-  Analytics,
 } from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import {BuyCard} from '~/components/BuyCard';
+import {Heading} from '~/components/Heading/Heading';
+import {AddToCartButton} from './cart';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
   return defer({...deferredData, ...criticalData});
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({
   context,
   params,
@@ -46,7 +42,6 @@ async function loadCriticalData({
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: {handle, ...paginationVariables},
-      // Add other queries here, so that they are loaded in parallel
     }),
   ]);
 
@@ -61,11 +56,6 @@ async function loadCriticalData({
   };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context}: LoaderFunctionArgs) {
   return {};
 }
@@ -73,21 +63,75 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
 
+  if (collection.title == 'Gift Card') {
+    return (
+      <div className="collection container">
+        <Heading className={'giftCardHeading'}>
+          The best surprise is a gift card in CloClips Shop!
+        </Heading>
+        <div className="giftCardCollection">
+          {collection.products.nodes[0].variants.nodes.map((variant) => (
+            <Link
+              key={variant.id}
+              className={'giftCardItem'}
+              to={`/products/${variant.product.handle}`}
+            >
+              <Image
+                src={variant.image.url}
+                aspectRatio="44/77"
+                sizes="(min-width: 44em) 20vw, 50vw"
+              />
+              <div className={'giftCardMain'}>
+                <h3 className={'giftCardTitle'}>{variant.product.title}</h3>
+                <AddToCartButton
+                  className="buy-card__button"
+                  onClick={(e) => e.stopPropagation()}
+                  disabled={!variant.availableForSale}
+                  lines={[
+                    {
+                      merchandiseId: variant.id,
+                      quantity: 1,
+                      selectedVariant: variant,
+                    },
+                  ]}
+                >
+                  {variant.availableForSale ? (
+                    <>
+                      <small className={'buy-card__price'}>
+                        <Money data={variant.price} />
+                      </small>
+                      <span>BUY</span>
+                    </>
+                  ) : (
+                    <span>OUT OF STOCK</span>
+                  )}
+                </AddToCartButton>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="collection">
-      <h1>{collection.title}</h1>
+    <div className="collection container">
+      <h1 className="collection__heading">{collection.title}</h1>
       <p className="collection-description">{collection.description}</p>
       <Pagination connection={collection.products}>
         {({nodes, isLoading, PreviousLink, NextLink}) => (
           <>
-            <PreviousLink>
-              {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-            </PreviousLink>
+            {
+              // <PreviousLink>
+              //   {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
+              // </PreviousLink>
+            }
             <ProductsGrid products={nodes} />
-            <br />
-            <NextLink>
-              {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-            </NextLink>
+            <div className="collection__more">
+              <NextLink>
+                {isLoading ? 'Loading...' : <span>Load more ↓</span>}
+              </NextLink>
+            </div>
           </>
         )}
       </Pagination>
@@ -106,49 +150,10 @@ export default function Collection() {
 function ProductsGrid({products}: {products: ProductItemFragment[]}) {
   return (
     <div className="products-grid">
-      {products.map((product, index) => {
-        return (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        );
+      {products?.map((product, index) => {
+        return <BuyCard key={product.id} product={product} />;
       })}
     </div>
-  );
-}
-
-function ProductItem({
-  product,
-  loading,
-}: {
-  product: ProductItemFragment;
-  loading?: 'eager' | 'lazy';
-}) {
-  const variant = product.variants.nodes[0];
-  const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
-  return (
-    <Link
-      className="product-item"
-      key={product.id}
-      prefetch="intent"
-      to={variantUrl}
-    >
-      {product.featuredImage && (
-        <Image
-          alt={product.featuredImage.altText || product.title}
-          aspectRatio="1/1"
-          data={product.featuredImage}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
-    </Link>
   );
 }
 
@@ -176,11 +181,25 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
         ...MoneyProductItem
       }
     }
-    variants(first: 1) {
+    variants(first: 3) {
       nodes {
+        id
+        title
+        availableForSale
+        image {
+          url
+        }
+        product {
+          title
+          handle
+        }
         selectedOptions {
           name
           value
+        }
+        price {
+          amount
+          currencyCode
         }
       }
     }

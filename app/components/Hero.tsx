@@ -1,3 +1,5 @@
+import {Link} from '@remix-run/react';
+
 export function Hero() {
   return (
     <div className="hero container">
@@ -8,6 +10,7 @@ export function Hero() {
       <p>
         Dive in and find the perfect piece of Bikini Bottom for your collection
       </p>
+      <Link to="/collections/all" className="hero__link" />
     </div>
   );
 }

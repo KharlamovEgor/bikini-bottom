@@ -1,5 +1,5 @@
-import {Suspense} from 'react';
-import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import { Suspense } from 'react';
+import { defer, redirect, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import {
   Await,
   Link,
@@ -24,12 +24,11 @@ import {
   type CartViewPayload,
   useAnalytics,
 } from '@shopify/hydrogen';
-import type {SelectedOption} from '@shopify/hydrogen/storefront-api-types';
-import {getVariantUrl} from '~/lib/variants';
-import {useAside} from '~/components/Aside';
+import type { SelectedOption } from '@shopify/hydrogen/storefront-api-types';
+import { getVariantUrl } from '~/lib/variants';
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return [{title: `Hydrogen | ${data?.product.title ?? ''}`}];
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [{ title: `Hydrogen | ${data?.product.title ?? ''}` }];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -39,7 +38,7 @@ export async function loader(args: LoaderFunctionArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return defer({...deferredData, ...criticalData});
+  return defer({ ...deferredData, ...criticalData });
 }
 
 /**
@@ -51,22 +50,22 @@ async function loadCriticalData({
   params,
   request,
 }: LoaderFunctionArgs) {
-  const {handle} = params;
-  const {storefront} = context;
+  const { handle } = params;
+  const { storefront } = context;
 
   if (!handle) {
     throw new Error('Expected product handle to be defined');
   }
 
-  const [{product}] = await Promise.all([
+  const [{ product }] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      variables: { handle, selectedOptions: getSelectedProductOptions(request) },
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
 
   if (!product?.id) {
-    throw new Response(null, {status: 404});
+    throw new Response(null, { status: 404 });
   }
 
   const firstVariant = product.variants.nodes[0];
@@ -83,7 +82,7 @@ async function loadCriticalData({
     // if no selected variant was returned from the selected options,
     // we redirect to the first variant's url with it's selected options applied
     if (!product.selectedVariant) {
-      throw redirectToFirstVariant({product, request});
+      throw redirectToFirstVariant({ product, request });
     }
   }
 
@@ -97,7 +96,7 @@ async function loadCriticalData({
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({context, params}: LoaderFunctionArgs) {
+function loadDeferredData({ context, params }: LoaderFunctionArgs) {
   // In order to show which variants are available in the UI, we need to query
   // all of them. But there might be a *lot*, so instead separate the variants
   // into it's own separate query that is deferred. So there's a brief moment
@@ -105,7 +104,7 @@ function loadDeferredData({context, params}: LoaderFunctionArgs) {
   // this deffered query resolves, the UI will update.
   const variants = context.storefront
     .query(VARIANTS_QUERY, {
-      variables: {handle: params.handle!},
+      variables: { handle: params.handle! },
     })
     .catch((error) => {
       // Log query errors, but don't throw them so the page can still render
@@ -142,10 +141,10 @@ function redirectToFirstVariant({
 }
 
 export default function Product() {
-  const {product, variants} = useLoaderData<typeof loader>();
-  const {selectedVariant} = product;
+  const { product, variants } = useLoaderData<typeof loader>();
+  const { selectedVariant } = product;
   return (
-    <div className="product">
+    <div className="product container">
       <ProductImage image={selectedVariant?.image} />
       <ProductMain
         selectedVariant={selectedVariant}
@@ -171,7 +170,7 @@ export default function Product() {
   );
 }
 
-function ProductImage({image}: {image: ProductVariantFragment['image']}) {
+function ProductImage({ image }: { image: ProductVariantFragment['image'] }) {
   if (!image) {
     return <div className="product-image" />;
   }
@@ -179,7 +178,7 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
     <div className="product-image">
       <Image
         alt={image.altText || 'Product Image'}
-        aspectRatio="1/1"
+        // aspectRatio="1/1"
         data={image}
         key={image.id}
         sizes="(min-width: 45em) 50vw, 100vw"
@@ -197,12 +196,11 @@ function ProductMain({
   selectedVariant: ProductFragment['selectedVariant'];
   variants: Promise<ProductVariantsQuery | null>;
 }) {
-  const {title, descriptionHtml} = product;
+  const { title, descriptionHtml } = product;
   return (
     <div className="product-main">
       <h1>{title}</h1>
       <ProductPrice selectedVariant={selectedVariant} />
-      <br />
       <Suspense
         fallback={
           <ProductForm
@@ -225,14 +223,10 @@ function ProductMain({
           )}
         </Await>
       </Suspense>
-      <br />
-      <br />
-      <p>
-        <strong>Description</strong>
-      </p>
-      <br />
-      <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-      <br />
+      <div className="product-description">
+        <h3>Description</h3>
+        <p dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+      </div>
     </div>
   );
 }
@@ -247,7 +241,6 @@ function ProductPrice({
       {selectedVariant?.compareAtPrice ? (
         <>
           <p>Sale</p>
-          <br />
           <div className="product-price-on-sale">
             {selectedVariant ? <Money data={selectedVariant.price} /> : null}
             <s>
@@ -271,8 +264,7 @@ function ProductForm({
   selectedVariant: ProductFragment['selectedVariant'];
   variants: Array<ProductVariantFragment>;
 }) {
-  const {open} = useAside();
-  const {publish, shop, cart, prevCart} = useAnalytics();
+  const { publish, shop, cart, prevCart } = useAnalytics();
   return (
     <div className="product-form">
       <VariantSelector
@@ -280,13 +272,11 @@ function ProductForm({
         options={product.options}
         variants={variants}
       >
-        {({option}) => <ProductOptions key={option.name} option={option} />}
+        {({ option }) => <ProductOptions key={option.name} option={option} />}
       </VariantSelector>
-      <br />
       <AddToCartButton
         disabled={!selectedVariant || !selectedVariant.availableForSale}
         onClick={() => {
-          open('cart');
           publish('cart_viewed', {
             cart,
             prevCart,
@@ -297,12 +287,12 @@ function ProductForm({
         lines={
           selectedVariant
             ? [
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity: 1,
-                  selectedVariant,
-                },
-              ]
+              {
+                merchandiseId: selectedVariant.id,
+                quantity: 1,
+                selectedVariant,
+              },
+            ]
             : []
         }
       >
@@ -312,12 +302,12 @@ function ProductForm({
   );
 }
 
-function ProductOptions({option}: {option: VariantOption}) {
+function ProductOptions({ option }: { option: VariantOption }) {
   return (
     <div className="product-options" key={option.name}>
       <h5>{option.name}</h5>
       <div className="product-options-grid">
-        {option.values.map(({value, isAvailable, isActive, to}) => {
+        {option.values.map(({ value, isAvailable, isActive, to }) => {
           return (
             <Link
               className="product-options-item"
@@ -336,7 +326,6 @@ function ProductOptions({option}: {option: VariantOption}) {
           );
         })}
       </div>
-      <br />
     </div>
   );
 }
@@ -355,7 +344,7 @@ function AddToCartButton({
   onClick?: () => void;
 }) {
   return (
-    <CartForm route="/cart" inputs={{lines}} action={CartForm.ACTIONS.LinesAdd}>
+    <CartForm route="/cart" inputs={{ lines }} action={CartForm.ACTIONS.LinesAdd}>
       {(fetcher: FetcherWithComponents<any>) => (
         <>
           <input

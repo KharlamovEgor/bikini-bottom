@@ -1,24 +1,15 @@
-import { Await } from '@remix-run/react';
-import { Suspense } from 'react';
-import type {
-  CartApiQueryFragment,
-  FooterQuery,
-  HeaderQuery,
-} from 'storefrontapi.generated';
-import { Aside } from '~/components/Aside';
-import { Header, HeaderMenu } from '~/components/Header';
-import { CartMain } from '~/components/Cart';
-import {
-  PredictiveSearchForm,
-  PredictiveSearchResults,
-} from '~/components/Search';
+import {Product} from '@shopify/hydrogen/storefront-api-types';
+import {useState} from 'react';
+import type {CartApiQueryFragment, HeaderQuery} from 'storefrontapi.generated';
+import {Aside} from '~/components/Aside';
+import {Header, HeaderMenu} from '~/components/Header';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
-  footer: Promise<FooterQuery | null>;
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  searchData: Promise<any>;
   children?: React.ReactNode;
 }
 
@@ -26,73 +17,28 @@ export function PageLayout({
   cart,
   children = null,
   header,
+  searchData,
   isLoggedIn,
   publicStoreDomain,
 }: PageLayoutProps) {
+  const [isOpened, setIsOpened] = useState<boolean>(false);
+
   return (
     <Aside.Provider>
-      <CartAside cart={cart} />
-      <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
       {header && (
         <Header
+          isOpened={isOpened}
+          setIsOpened={setIsOpened}
           header={header}
           cart={cart}
           isLoggedIn={isLoggedIn}
           publicStoreDomain={publicStoreDomain}
+          searchData={searchData}
         />
       )}
-      <main>{children}</main>
+      <main onClick={() => setIsOpened(false)}>{children}</main>
     </Aside.Provider>
-  );
-}
-
-function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
-  return (
-    <Aside type="cart" heading="CART">
-      <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await resolve={cart}>
-          {(cart) => {
-            return <CartMain cart={cart!} layout="aside" />;
-          }}
-        </Await>
-      </Suspense>
-    </Aside>
-  );
-}
-
-function SearchAside() {
-  return (
-    <Aside type="search" heading="SEARCH">
-      <div className="predictive-search">
-        <br />
-        <PredictiveSearchForm>
-          {({ fetchResults, inputRef }) => (
-            <div>
-              <input
-                name="q"
-                onChange={fetchResults}
-                onFocus={fetchResults}
-                placeholder="Search"
-                ref={inputRef}
-                type="search"
-              />
-              &nbsp;
-              <button
-                onClick={() => {
-                  window.location.href = inputRef?.current?.value
-                    ? `/search?q=${inputRef.current.value}`
-                    : `/search`;
-                }}
-              >
-                Search
-              </button>
-            </div>
-          )}
-        </PredictiveSearchForm>
-        <PredictiveSearchResults />
-      </div>
-    </Aside>
   );
 }
 

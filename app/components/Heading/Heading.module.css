@@ -1,0 +1,7 @@
+.heading {
+  text-align: center;
+  font-size: clamp(1.5625rem, 1.192rem + 1.5808vw, 3rem);
+  color: var(--color-dark, #353535);
+  font-weight: 500;
+  margin: 0;
+}

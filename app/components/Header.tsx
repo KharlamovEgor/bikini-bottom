@@ -1,5 +1,4 @@
-import {Suspense} from 'react';
-import {Await, NavLink} from '@remix-run/react';
+import {Link, NavLink} from '@remix-run/react';
 import {type CartViewPayload, useAnalytics} from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
@@ -7,32 +6,45 @@ import {useAside} from '~/components/Aside';
 import searchSrc from '~/assets/images/searh.svg';
 import cartSrc from '~/assets/images/cart.svg';
 import menuSrc from '~/assets/images/menu.svg';
+import {CustomSearch} from './CustomSerch/CustomSearch';
 
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  searchData: Promise<any>;
+  setIsOpened: (...args: any) => void;
+  isOpened: boolean;
 }
 
 type Viewport = 'desktop' | 'mobile';
 
 export function Header({
+  isOpened,
+  setIsOpened,
   header,
-  isLoggedIn,
-  cart,
   publicStoreDomain,
+  searchData,
 }: HeaderProps) {
   const {menu} = header;
+
   return (
-    <header className="header container">
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+    <header className="header" onClick={(e) => e.stopPropagation()}>
+      <div className="container">
+        <HeaderMenu
+          menu={menu}
+          viewport="desktop"
+          primaryDomainUrl={header.shop.primaryDomain.url}
+          publicStoreDomain={publicStoreDomain}
+        />
+        <HeaderCtas setIsOpened={setIsOpened} />
+        <CustomSearch
+          setIsOpened={setIsOpened}
+          isOpened={isOpened}
+          searchData={searchData}
+        />
+      </div>
     </header>
   );
 }
@@ -98,12 +110,12 @@ export function HeaderMenu({
   );
 }
 
-function HeaderCtas({cart}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+function HeaderCtas({setIsOpened}: {setIsOpened: (...args: any) => void}) {
   return (
     <nav className="header-ctas" role="navigation">
       <HeaderMenuMobileToggle />
-      <SearchToggle />
-      <CartToggle cart={cart} />
+      <SearchToggle setIsOpened={setIsOpened} />
+      <CartLink />
     </nav>
   );
 }
@@ -120,26 +132,25 @@ function HeaderMenuMobileToggle() {
   );
 }
 
-function SearchToggle() {
-  const {open} = useAside();
+function SearchToggle({setIsOpened}: {setIsOpened: (...args: any) => void}) {
   return (
-    <button className="reset search-button" onClick={() => open('search')}>
+    <button
+      className="reset search-button"
+      onClick={() => setIsOpened((prevState) => !prevState)}
+    >
       <img src={searchSrc} />
     </button>
   );
 }
 
-function CartBadge() {
-  const {open} = useAside();
+function CartLink() {
   const {publish, shop, cart, prevCart} = useAnalytics();
 
   return (
-    <a
+    <Link
       className="cart-button"
-      href="/cart"
-      onClick={(e) => {
-        e.preventDefault();
-        open('cart');
+      to="/cart"
+      onClick={() => {
         publish('cart_viewed', {
           cart,
           prevCart,
@@ -149,20 +160,7 @@ function CartBadge() {
       }}
     >
       <img src={cartSrc} />
-    </a>
-  );
-}
-
-function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
-  return (
-    <Suspense fallback={<CartBadge />}>
-      <Await resolve={cart}>
-        {(cart) => {
-          if (!cart) return <CartBadge />;
-          return <CartBadge />;
-        }}
-      </Await>
-    </Suspense>
+    </Link>
   );
 }
 

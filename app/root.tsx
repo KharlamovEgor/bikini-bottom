@@ -17,24 +17,20 @@ import appStyles from '~/styles/app.css?url';
 import customStyles from '~/styles/custom.css?url';
 import fontsStyles from '~/styles/fonts.css?url';
 import {PageLayout} from '~/components/PageLayout';
-import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {HEADER_QUERY} from '~/lib/fragments';
+import {PRODUCT_ITEM_FRAGMENT} from './queryes';
 
 export type RootLoader = typeof loader;
 
-/**
- * This is important to avoid re-fetching root queries on sub-navigations
- */
 export const shouldRevalidate: ShouldRevalidateFunction = ({
   formMethod,
   currentUrl,
   nextUrl,
 }) => {
-  // revalidate when a mutation is performed e.g add to cart, login...
   if (formMethod && formMethod !== 'GET') {
     return true;
   }
 
-  // revalidate when manually revalidating via useRevalidator
   if (currentUrl.toString() === nextUrl.toString()) {
     return true;
   }
@@ -61,12 +57,8 @@ export function links() {
 }
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   const {storefront, env} = args.context;
 
   return defer(
@@ -91,10 +83,6 @@ export async function loader(args: LoaderFunctionArgs) {
   );
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context}: LoaderFunctionArgs) {
   const {storefront} = context;
 
@@ -105,23 +93,34 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
         headerMenuHandle: 'main-menu', // Adjust to your header menu handle
       },
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   return {
     header,
+    // searchData: searchData.products.nodes,
   };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
+export const PRODUCTS_QUERY = `#graphql
+  query searchData {
+    products(first: 250) {
+      nodes {
+        ...ProductItem
+      }
+    }
+  }
+  ${PRODUCT_ITEM_FRAGMENT}
+`;
+
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  const {customerAccount, cart} = context;
+  const {customerAccount, cart, storefront} = context;
+
+  const searchData = storefront.query(PRODUCTS_QUERY, {
+    cache: storefront.CacheLong(),
+  });
 
   return {
+    searchData,
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
   };
