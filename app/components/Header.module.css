@@ -1,0 +1,24 @@
+.cartLink {
+  position: relative;
+}
+
+.cartLink::after {
+  content: attr(data-count);
+  position: absolute;
+  color: white;
+  background: tomato;
+  font-size: 0.6rem;
+  width: 1.57em;
+  height: 1.57em;
+  border-radius: 100%;
+  text-align: center;
+  top: 0;
+  right: 0;
+  line-height: 1.57em;
+}
+
+@media screen and (min-width: 720px) {
+  .cartLink::after {
+    font-size: 1rem;
+  }
+}

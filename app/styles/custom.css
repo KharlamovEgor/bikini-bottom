@@ -296,13 +296,12 @@ button.header-menu-mobile-toggle {
   }
 }
 
-.giftCard h3 {
+.giftCard__heading {
   font-size: clamp(1.5625rem, 1.192rem + 1.5808vw, 3rem);
   color: var(--color-dark);
   max-width: 14em;
-  margin: 0 auto;
+  margin: 0 auto 70px !important;
   font-weight: 500;
-  margin-bottom: 70px;
 }
 
 .giftCard img {

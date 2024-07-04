@@ -1,12 +1,15 @@
-import {Link, NavLink} from '@remix-run/react';
-import {type CartViewPayload, useAnalytics} from '@shopify/hydrogen';
-import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
-import {useAside} from '~/components/Aside';
+import { Link, NavLink } from '@remix-run/react';
+import { type CartViewPayload, useAnalytics } from '@shopify/hydrogen';
+import type { HeaderQuery, CartApiQueryFragment } from 'storefrontapi.generated';
+import { useAside } from '~/components/Aside';
 
 import searchSrc from '~/assets/images/searh.svg';
 import cartSrc from '~/assets/images/cart.svg';
 import menuSrc from '~/assets/images/menu.svg';
-import {CustomSearch} from './CustomSerch/CustomSearch';
+import { CustomSearch } from './CustomSerch/CustomSearch';
+
+import styles from './Header.module.css';
+import classNames from 'classnames';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -27,7 +30,7 @@ export function Header({
   publicStoreDomain,
   searchData,
 }: HeaderProps) {
-  const {menu} = header;
+  const { menu } = header;
 
   return (
     <header className="header" onClick={(e) => e.stopPropagation()}>
@@ -88,8 +91,8 @@ export function HeaderMenu({
         // if the url is internal, we strip the domain
         const url =
           item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
+            item.url.includes(publicStoreDomain) ||
+            item.url.includes(primaryDomainUrl)
             ? new URL(item.url).pathname
             : item.url;
         return (
@@ -110,7 +113,7 @@ export function HeaderMenu({
   );
 }
 
-function HeaderCtas({setIsOpened}: {setIsOpened: (...args: any) => void}) {
+function HeaderCtas({ setIsOpened }: { setIsOpened: (...args: any) => void }) {
   return (
     <nav className="header-ctas" role="navigation">
       <HeaderMenuMobileToggle />
@@ -121,7 +124,7 @@ function HeaderCtas({setIsOpened}: {setIsOpened: (...args: any) => void}) {
 }
 
 function HeaderMenuMobileToggle() {
-  const {open} = useAside();
+  const { open } = useAside();
   return (
     <button
       className="header-menu-mobile-toggle reset"
@@ -132,7 +135,7 @@ function HeaderMenuMobileToggle() {
   );
 }
 
-function SearchToggle({setIsOpened}: {setIsOpened: (...args: any) => void}) {
+function SearchToggle({ setIsOpened }: { setIsOpened: (...args: any) => void }) {
   return (
     <button
       className="reset search-button"
@@ -144,11 +147,12 @@ function SearchToggle({setIsOpened}: {setIsOpened: (...args: any) => void}) {
 }
 
 function CartLink() {
-  const {publish, shop, cart, prevCart} = useAnalytics();
+  const { publish, shop, cart, prevCart } = useAnalytics();
 
   return (
     <Link
-      className="cart-button"
+      data-count={cart?.lines.nodes.length || 0}
+      className={classNames('cart-button', styles.cartLink)}
       to="/cart"
       onClick={() => {
         publish('cart_viewed', {
