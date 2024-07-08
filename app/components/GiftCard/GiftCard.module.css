@@ -1,0 +1,30 @@
+.giftCard {
+}
+
+.giftCard img {
+  width: min(1000px, 100%);
+}
+
+.heading {
+  font-size: clamp(1.5625rem, 1.192rem + 1.5808vw, 3rem);
+  color: var(--color-dark);
+  max-width: 14em;
+  margin: 0 auto 70px !important;
+  font-weight: 500;
+}
+
+.collection {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1em;
+  justify-content: center;
+
+  @media (min-width: 45em) {
+    grid-template-columns: repeat(3, 290px);
+  }
+}
+
+.collection img {
+  height: auto;
+  border-radius: 20px;
+}

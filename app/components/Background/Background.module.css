@@ -1,0 +1,16 @@
+.background {
+  background-image: url('./bg-mobile.png');
+  background-repeat: no-repeat;
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 100%;
+  background-size: 860px;
+  background-position: 37% top;
+
+  @media (min-width: 45em) {
+    background-position: center center;
+    background-image: url('./bg.png');
+    max-width: 2200px;
+    background-size: cover;
+  }
+}

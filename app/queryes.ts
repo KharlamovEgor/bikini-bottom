@@ -107,16 +107,36 @@ export const COLLECTIONS_QUERY = `#graphql
       first: $first,
     ) {
       nodes {
+        image {
+          url
+        }
         id
         title
         onlineStoreUrl
-        products(first: 1) {
-          edges {
-            node {
-              featuredImage {
-                src
-              }
-            }
+      }
+    }  
+  }
+`;
+
+export const GIFT_CARD_QUERY = `#graphql
+  query Product {
+    product(handle: "gift-card") {
+      title
+      variants(first: 3) {
+        nodes {
+          title
+          availableForSale
+          product {
+            handle
+            title
+          }
+          price {
+            amount
+            currencyCode
+          }
+          id
+          image {
+            url
           }
         }
       }

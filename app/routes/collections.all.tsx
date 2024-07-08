@@ -1,48 +1,48 @@
-import { defer, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
-import { useLoaderData, Link, type MetaFunction } from '@remix-run/react';
-import { Pagination, getPaginationVariables } from '@shopify/hydrogen';
-import type { ProductItemFragment } from 'storefrontapi.generated';
-import { useVariantUrl } from '~/lib/variants';
-import { ProductCard } from '~/components/ProductCard';
-import { BuyCard } from '~/components/BuyCard';
+import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {useLoaderData, type MetaFunction} from '@remix-run/react';
+import {Pagination, getPaginationVariables} from '@shopify/hydrogen';
+import type {ProductItemFragment} from 'storefrontapi.generated';
+import {BuyCard} from '~/components/BuyCard';
+import {Grid} from '~/components/Grid/Grid';
+import {Container} from '~/components/Container/Container';
 
 export const meta: MetaFunction<typeof loader> = () => {
-  return [{ title: `Hydrogen | Products` }];
+  return [{title: `Hydrogen | Products`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
 
-  return defer({ ...deferredData, ...criticalData });
+  return defer({...deferredData, ...criticalData});
 }
 
-async function loadCriticalData({ context, request }: LoaderFunctionArgs) {
-  const { storefront } = context;
+async function loadCriticalData({context, request}: LoaderFunctionArgs) {
+  const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
 
-  const [{ products }] = await Promise.all([
+  const [{products}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
-      variables: { ...paginationVariables },
+      variables: {...paginationVariables},
     }),
   ]);
-  return { products };
+  return {products};
 }
 
-function loadDeferredData({ context }: LoaderFunctionArgs) {
+function loadDeferredData({context}: LoaderFunctionArgs) {
   return {};
 }
 
 export default function Collection() {
-  const { products } = useLoaderData<typeof loader>();
+  const {products} = useLoaderData<typeof loader>();
 
   return (
     <div className="collection">
       <h1 className="collection__heading">Products</h1>
       <Pagination connection={products}>
-        {({ nodes, isLoading, PreviousLink, NextLink }) => (
+        {({nodes, isLoading, PreviousLink, NextLink}) => (
           <>
             {
               // <PreviousLink>
@@ -62,13 +62,15 @@ export default function Collection() {
   );
 }
 
-function ProductsGrid({ products }: { products: ProductItemFragment[] }) {
+function ProductsGrid({products}: {products: ProductItemFragment[]}) {
   return (
-    <div className="products-grid container">
-      {products?.map((product) => {
-        return <BuyCard key={product.id} product={product} />;
-      })}
-    </div>
+    <Container>
+      <Grid>
+        {products?.map((product) => {
+          return <BuyCard key={product.id} product={product} />;
+        })}
+      </Grid>
+    </Container>
   );
 }
 

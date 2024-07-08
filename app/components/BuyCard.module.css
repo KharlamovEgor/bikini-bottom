@@ -1,3 +1,12 @@
+.buyCard {
+  text-decoration: none !important;
+  transition: transform 0.2s linear;
+
+  &:hover {
+    transform: scale(0.95);
+  }
+}
+
 .buy-card__price {
   font-size: clamp(1rem, 0.8711rem + 0.5498vw, 1.5rem);
   font-size: 1.5rem;
@@ -7,7 +16,7 @@
   border-radius: 20px;
 }
 
-.buy-card img {
+.buyCard img {
   height: auto;
 }
 
@@ -21,6 +30,10 @@
 
 .small .buy-card__title {
   font-size: 1rem;
+
+  @media (min-width: 45em) {
+    font-size: 1.2rem;
+  }
 }
 
 @media (max-width: 720px) {
@@ -50,7 +63,7 @@
   width: 100%;
 
   padding-top: 1.4em;
-  padding-bottom: 1.4em;
+  padding-bottom: 1.3em;
 
   border: none;
   border-radius: 100px;
@@ -59,7 +72,6 @@
 
   font-weight: 500;
   font-size: clamp(1rem, 0.8711rem + 0.5498vw, 1.5rem);
-  line-height: 1;
 
   display: flex;
   justify-content: center;
@@ -114,11 +126,11 @@
   /*   #ff8d91 100% */
   /* ); */
   /**/
-  background: radial-gradient(54.24% 54.24% at 52.25% 73.5%,
-      #ffffff 0%,
-      #d7c548 100%)
-    /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */
-  ;
+  background: radial-gradient(
+    54.24% 54.24% at 52.25% 73.5%,
+    #ffffff 0%,
+    #d7c548 100%
+  );
 }
 
 .buy-card__price {
@@ -134,4 +146,15 @@
   .mobileSmall .buy-card__price {
     font-size: 1rem;
   }
+}
+
+.toCart {
+  text-transform: uppercase;
+  text-decoration: none !important;
+}
+
+.toCart span {
+  color: #ff8d91;
+  font-size: 1.5rem;
+  font-weight: 400;
 }

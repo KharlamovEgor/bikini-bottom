@@ -1,16 +1,18 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, Link, useLoaderData, type MetaFunction} from '@remix-run/react';
-import {Suspense} from 'react';
+import {Suspense, createContext} from 'react';
 import {Pagination, getPaginationVariables} from '@shopify/hydrogen';
 import {Hero} from '~/components/Hero';
-import {GiftCard} from '~/components/GiftCard';
-import {Slider} from '~/components/Slider';
+import {GiftCard} from '~/components/GiftCard/GiftCard';
+import {Slider} from '~/components/Slider/Slider';
 import {BuyCard} from '~/components/BuyCard';
 import {
   ALL_PRODUCTS_QUERY,
   COLLECTIONS_QUERY,
   COLLECTION_QUERY,
+  GIFT_CARD_QUERY,
 } from '~/queryes';
+import {Categories} from '~/components/Categories/Categories';
 
 export const meta: MetaFunction = () => {
   return [{title: 'CloClips | Home'}];
@@ -54,10 +56,13 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     variables: {first: 250},
   });
 
+  const {product} = await context.storefront.query(GIFT_CARD_QUERY);
+
   return {
     bestCollection: collection,
     allProducts: products,
     collections,
+    giftCard: product,
   };
 }
 
@@ -66,16 +71,20 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 }
 
 export default function Homepage() {
-  const {allProducts, bestCollection, collections} =
+  const {allProducts, bestCollection, collections, giftCard, cart} =
     useLoaderData<typeof loader>();
   return (
     <div className="home">
       <Slider />
       <NewCollection products={allProducts} />
       <BestSellers products={bestCollection} />
-      <Categories collections={collections} />
+      <Categories
+        collections={collections.nodes.filter(
+          (collection) => collection.title != 'best',
+        )}
+      />
       <Hero />
-      <GiftCard />
+      <GiftCard className="giftCard" product={giftCard} />
     </div>
   );
 }
@@ -93,45 +102,43 @@ interface Collection {
   };
 }
 
-function Categories({
-  collections,
-}: {
-  collections: Promise<{nodes: Array<Collection>}>;
-}): JSX.Element {
-  return (
-    <div className="collections">
-      <h2 className="new-collection__heading">Categories</h2>
-      <div className="container collection-grid">
-        <Suspense fallback={<div>Loading...</div>}>
-          <Await resolve={collections}>
-            {(response) => {
-              const filteredData = response.nodes.filter(
-                (collection) =>
-                  collection.title != 'best' && collection.title != 'Home page',
-              );
-              return filteredData.map((collection) => (
-                <Link
-                  to={collection.onlineStoreUrl}
-                  className="collection-card"
-                  key={collection.id}
-                >
-                  <div className="collection-card__image">
-                    <img
-                      src={collection.products.edges[0].node.featuredImage?.src}
-                    />
-                  </div>
-                  <div className="collection-card__data">
-                    <h4>{collection.title}</h4>
-                  </div>
-                </Link>
-              ));
-            }}
-          </Await>
-        </Suspense>
-      </div>
-    </div>
-  );
-}
+//function Categories({
+//  collections,
+//}: {
+//  collections: Promise<{nodes: Array<Collection>}>;
+//}): JSX.Element {
+//  return (
+//    <div className="collections">
+//      <h2 className="new-collection__heading">Categories</h2>
+//      <div className="container collection-grid">
+//        <Suspense fallback={<div>Loading...</div>}>
+//          <Await resolve={collections}>
+//            {(response) => {
+//              const filteredData = response.nodes.filter(
+//                (collection) =>
+//                  collection.title != 'best' && collection.title != 'Home page',
+//              );
+//              return filteredData.map((collection) => (
+//                <Link
+//                  to={collection.onlineStoreUrl}
+//                  className="collection-card"
+//                  key={collection.id}
+//                >
+//                  <div className="collection-card__image">
+//                    <img src={collection?.image?.url} />
+//                  </div>
+//                  <div className="collection-card__data">
+//                    <h4>{collection.title}</h4>
+//                  </div>
+//                </Link>
+//              ));
+//            }}
+//          </Await>
+//        </Suspense>
+//      </div>
+//    </div>
+//  );
+//}
 
 function NewCollection({products}: {products: Promise<any | null>}) {
   return (

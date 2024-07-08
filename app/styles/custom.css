@@ -9,7 +9,7 @@
   }
 }
 
-.home>.container:first-child {
+.home > .container:first-child {
   @media (min-width: 45em) {
     padding-left: 10px;
     padding-right: 10px;
@@ -20,7 +20,6 @@
   max-width: 100%;
 }
 
-.buy-card__image-container,
 .collection-card {
   position: relative;
   border-radius: 20px;
@@ -32,19 +31,18 @@
   /*   #ff8d91 100% */
   /* ); */
   /**/
-  background: radial-gradient(54.24% 54.24% at 52.25% 73.5%,
+  background: radial-gradient(
+      54.24% 54.24% at 52.25% 73.5%,
       #ffffff 0%,
-      #d7c548 100%)
-    /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */
-  ;
+      #d7c548 100%
+    )
+    /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
 }
 
-.buy-card__image-container,
 .collection-card__image {
   font-size: 0;
 }
 
-.buy-card__data,
 .collection-card__data {
   position: absolute;
   padding: 10px;
@@ -55,52 +53,6 @@
   display: flex;
   flex-direction: column;
   gap: 1em;
-}
-
-.buy-card__button {
-  background-color: white;
-  width: 100%;
-
-  padding-top: 1.4em;
-  padding-bottom: 1.4em;
-
-  border: none;
-  border-radius: 100px;
-
-  transition: all 0.2s linear;
-
-  font-weight: 500;
-  font-size: clamp(1rem, 0.8711rem + 0.5498vw, 1.5rem);
-  line-height: 1;
-
-  display: flex;
-  justify-content: center;
-  gap: 0.33em;
-}
-
-.buy-card__button:hover {
-  background-color: #eeeeee;
-}
-
-.buy-card__button:disabled {
-  background-color: white;
-}
-
-.buy-card__price {
-  color: #ff8d91;
-}
-
-.buy-card__button span {
-  font-size: 1.5rem;
-  color: #353535;
-}
-
-.buy-card__title {
-  margin-top: 0.8em;
-  font-size: 1.5rem;
-  font-weight: 400;
-  text-align: center;
-  color: #353535;
 }
 
 .recommended-products,
@@ -130,7 +82,7 @@
   }
 }
 
-:is(.buy-card, .recommended-product) img {
+:is(.recommended-product) img {
   height: auto;
 }
 
@@ -141,7 +93,7 @@
   font-size: 0;
 }
 
-:where(.recommended-product__image-container, .buy-card__image-container) img {
+:where(.recommended-product__image-container) img {
   border-radius: 20px;
 }
 
@@ -151,8 +103,7 @@
   font-size: 1.5rem;
 }
 
-.recommended-product__price,
-.buy-card__price {
+.recommended-product__price {
   font-size: clamp(1rem, 0.8711rem + 0.5498vw, 1.5rem);
   font-size: 1.5rem;
 }
@@ -180,17 +131,36 @@
 }
 
 .header-menu-desktop {
-  gap: 4rem;
+  gap: 2.9em;
+}
+
+.header-menu-item img {
+  height: 1.5rem;
+
+  @media (min-width: 45em) {
+    height: clamp(0.5rem, 0.2423rem + 1.0997vw, 1.5rem);
+  }
 }
 
 .header-menu-item {
-  color: var(--color-dark, #353535);
+  display: flex;
+  align-items: end;
+  line-height: 0.8;
+  gap: 0.5em;
+  color: var(--color-dark, #353535) !important;
   font-size: clamp(0.5rem, 0.2423rem + 1.0997vw, 1.5rem);
+  text-decoration: none !important;
+  transition: color 0.2s linear;
+
+  &:hover {
+    color: black !important;
+  }
 }
 
 button.search-button,
 a.cart-button,
 button.header-menu-mobile-toggle {
+  cursor: pointer;
   background-color: #f2f2f2;
   border-radius: 100%;
   width: 43px;
@@ -210,12 +180,12 @@ button.header-menu-mobile-toggle {
 }
 
 .hero {
-  margin-top: 60px;
+  /*margin-top: 60px;*/
   position: relative;
 
   @media (min-width: 45em) {
-    margin-top: 180px;
-    background-image: url('../assets/images/hero.bg');
+    /*margin-top: 180px;*/
+    background-image: url('../assets/images/hero.png');
     background-size: 100%;
     max-width: 1810px;
     aspect-ratio: 181/94;
@@ -281,64 +251,6 @@ button.header-menu-mobile-toggle {
     width: 20em;
     height: 10em;
     top: 45%;
-  }
-}
-
-.giftCard {
-  text-align: center;
-  margin-top: 180px;
-  margin-bottom: 100px;
-
-  margin-top: 60px;
-
-  @media (min-width: 45em) {
-    margin-top: 180px;
-  }
-}
-
-.giftCard__heading {
-  font-size: clamp(1.5625rem, 1.192rem + 1.5808vw, 3rem);
-  color: var(--color-dark);
-  max-width: 14em;
-  margin: 0 auto 70px !important;
-  font-weight: 500;
-}
-
-.giftCard img {
-  width: min(1000px, 100%);
-}
-
-.first-slide {
-  position: relative;
-  overflow: hidden;
-  background-image: url('../assets/images/slide-1-mobile.png');
-  background-size: 500px;
-  background-position: center top;
-  color: white;
-  height: 730px;
-
-  background-repeat: no-repeat;
-
-  @media (min-width: 45em) {
-    height: auto;
-    aspect-ratio: 2227/1291;
-    background-image: url('../assets/images/slide-1-full.png');
-    background-size: 100%;
-  }
-}
-
-.first-slide__link a {
-  position: absolute;
-  width: 6em;
-  height: 5em;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%);
-
-  @media (min-width: 45em) {
-    width: 20em;
-    height: 10em;
-    top: 60%;
   }
 }
 
@@ -410,7 +322,8 @@ button.header-menu-mobile-toggle {
   }
 }
 
-.product-image {}
+.product-image {
+}
 
 .product-description p {
   font-size: clamp(0.875rem, 0.7139rem + 0.6873vw, 1.5rem);
@@ -435,11 +348,12 @@ button.header-menu-mobile-toggle {
 }
 
 .collection-card {
-  background: radial-gradient(54.24% 54.24% at 52.25% 73.5%,
+  background: radial-gradient(
+      54.24% 54.24% at 52.25% 73.5%,
       #ffffff 0%,
-      #ff8d91 100%)
-    /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */
-  ;
+      #ff8d91 100%
+    )
+    /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
 }
 
 .collection-card__data h4 {
@@ -468,46 +382,50 @@ button.header-menu-mobile-toggle {
   font-size: 1.5rem;
 }
 
-.giftCardCollection {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1em;
-  justify-content: center;
+.giftCard {
+  margin-top: 10em;
+  margin-bottom: 5em;
 
   @media (min-width: 45em) {
-    grid-template-columns: repeat(3, 290px);
+    margin-bottom: 10em;
   }
 }
 
-.giftCardCollection img {
-  height: auto;
-  border-radius: 20px;
+button.slick-arrow {
+  top: 45%;
+  width: 63px;
+  height: 63px;
+  background-color: #ff8d91;
+  border-radius: 100%;
+  transition: all 0.2s linear;
+
+  &:hover {
+    background-color: hsla(358, 100%, 70%, 1);
+  }
 }
 
-h2.giftCardHeading {
-  max-width: 14em;
-  margin: 0 auto;
-  margin-bottom: 1em;
+button.slick-prev {
+  left: -80px;
 }
 
-.giftCardTitle {
-  font-size: 2.2rem;
-  color: white;
-  text-align: center;
-  margin: 0;
-  margin-bottom: 0.6em;
+button.slick-next {
+  right: -80px;
 }
 
-.giftCardItem {
-  text-decoration: none !important;
-  position: relative;
-  font-size: 0;
-}
-
-.giftCardMain {
+button:is(.slick-prev, .slick-next)::before {
+  opacity: 1;
   position: absolute;
-  width: 100%;
-  font-size: 1rem;
-  padding: 0.9em 0.7em;
+  content: '';
+  background-image: url('../assets/images/slider-arrow.svg');
+  left: 0;
+  background-repeat: no-repeat;
+  right: 0;
   bottom: 0;
+  top: 0;
+  background-size: 30px;
+  background-position: 18px center;
+}
+
+button.slick-prev::before {
+  transform: rotate(180deg);
 }

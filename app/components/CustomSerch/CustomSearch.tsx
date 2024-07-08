@@ -3,9 +3,13 @@ import {CustomSearchProps} from './CustomSearch.props';
 import styles from './CustomSearch.module.css';
 import {useEffect, useState} from 'react';
 import {BuyCard} from '../BuyCard';
-import {ScrollGrid} from '../ScrollGrid/ScrollGrid';
 import {Container} from '../Container/Container';
 import {Product} from '@shopify/hydrogen/storefront-api-types';
+
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import {ScrollGrid} from '../ScrollGrid/ScrollGrid';
 
 export function CustomSearch({
   searchData,
@@ -28,11 +32,9 @@ export function CustomSearch({
 
   useEffect(() => {
     setData(
-      loadedData
-        .filter((product) =>
-          product.title.toLowerCase().includes(searchReq.toLowerCase()),
-        )
-        .splice(0, 4),
+      loadedData.filter((product) =>
+        product.title.toLowerCase().includes(searchReq.toLowerCase()),
+      ),
     );
   }, [searchReq, loadedData]);
 
@@ -53,16 +55,33 @@ export function CustomSearch({
               placeholder="Search..."
             />
           </form>
-          <ScrollGrid className={classNames()}>
-            {data?.map((product) => (
-              <BuyCard
-                mobileSmall
-                key={product.id}
-                product={product}
-                onClick={() => setIsOpened(false)}
-              />
-            ))}
-          </ScrollGrid>
+          {globalThis?.innerWidth > 700 && data.length > 6 ? (
+            <SimpleSlider
+              chidren={data?.map((product) => (
+                <div key={product.id} className={styles.cardContainer}>
+                  <BuyCard
+                    className={styles.card}
+                    mobileSmall
+                    product={product}
+                    onClick={() => setIsOpened(false)}
+                  />
+                </div>
+              ))}
+            />
+          ) : (
+            <ScrollGrid className={styles.grid}>
+              {data?.map((product) => (
+                <BuyCard
+                  key={product.id}
+                  className={styles.card}
+                  mobileSmall
+                  product={product}
+                  onClick={() => setIsOpened(false)}
+                />
+              ))}
+            </ScrollGrid>
+          )}
+
           {
             //data.length == 4 && (
             //   <Link
@@ -77,4 +96,15 @@ export function CustomSearch({
       </div>
     </div>
   );
+}
+
+export default function SimpleSlider({chidren}) {
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 6,
+    slidesToScroll: 4,
+  };
+  return <Slider {...settings}>{chidren}</Slider>;
 }

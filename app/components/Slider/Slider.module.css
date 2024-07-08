@@ -1,0 +1,33 @@
+.slide {
+  position: relative;
+  overflow: hidden;
+  background-image: url('./slide-1-mobile.png');
+  background-size: 500px;
+  background-position: center top;
+  color: white;
+  height: 730px;
+
+  background-repeat: no-repeat;
+
+  @media (min-width: 45em) {
+    height: auto;
+    aspect-ratio: 1920/1115;
+    background-image: url('./slide-1-full.png');
+    background-size: 100%;
+  }
+}
+
+.link a {
+  position: absolute;
+  width: 6em;
+  height: 5em;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%);
+
+  @media (min-width: 45em) {
+    width: 20em;
+    height: 10em;
+    top: 60%;
+  }
+}

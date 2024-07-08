@@ -1,0 +1,6 @@
+.giftCard {
+  @media (min-width: 45em) {
+    margin-top: 9em;
+    margin-bottom: 12em;
+  }
+}

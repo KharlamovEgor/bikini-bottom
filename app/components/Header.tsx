@@ -1,15 +1,26 @@
-import { Link, NavLink } from '@remix-run/react';
-import { type CartViewPayload, useAnalytics } from '@shopify/hydrogen';
-import type { HeaderQuery, CartApiQueryFragment } from 'storefrontapi.generated';
-import { useAside } from '~/components/Aside';
+import {Link, NavLink, useLocation} from '@remix-run/react';
+import {type CartViewPayload, useAnalytics} from '@shopify/hydrogen';
+
+import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
+import {useAside} from '~/components/Aside';
 
 import searchSrc from '~/assets/images/searh.svg';
 import cartSrc from '~/assets/images/cart.svg';
 import menuSrc from '~/assets/images/menu.svg';
-import { CustomSearch } from './CustomSerch/CustomSearch';
+import {CustomSearch} from './CustomSerch/CustomSearch';
 
 import styles from './Header.module.css';
 import classNames from 'classnames';
+
+import HomeSrc from '../assets/images/home.svg';
+import AllSrc from '../assets/images/all.svg';
+import PlushSrc from '../assets/images/plush.svg';
+import AccessoriesSrc from '../assets/images/accessories.svg';
+import GiftSrc from '../assets/images/gift.svg';
+import BestSrc from '../assets/images/best.svg';
+import SchoolSrc from '../assets/images/school.svg';
+import PhoneSrc from '../assets/images/phone.svg';
+import LegotSrc from '../assets/images/lego.svg';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -30,11 +41,16 @@ export function Header({
   publicStoreDomain,
   searchData,
 }: HeaderProps) {
-  const { menu } = header;
+  const {menu} = header;
+  const {pathname} = useLocation();
 
   return (
     <header className="header" onClick={(e) => e.stopPropagation()}>
-      <div className="container">
+      <div
+        className={classNames('container', {
+          [styles.bigContainer]: pathname != '/',
+        })}
+      >
         <HeaderMenu
           menu={menu}
           viewport="desktop"
@@ -85,35 +101,101 @@ export function HeaderMenu({
           Home
         </NavLink>
       )}
-      {menu?.items.map((item) => {
-        if (!item.url) return null;
-
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-            item.url.includes(publicStoreDomain) ||
-            item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        return (
-          <NavLink
-            className="header-menu-item"
-            end
-            key={item.id}
-            onClick={closeAside}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/'}
+      >
+        <img src={HomeSrc} /> Home
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/all'}
+      >
+        <img src={AllSrc} /> Shop All
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/plush-toys'}
+      >
+        <img src={PlushSrc} /> Plush Toys
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/lego'}
+      >
+        <img src={LegotSrc} /> Lego
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/office'}
+      >
+        <img src={SchoolSrc} /> School
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/accessories'}
+      >
+        <img src={AccessoriesSrc} /> Accessories
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/gift-card'}
+      >
+        <img src={GiftSrc} /> Gift card
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/phone-accessories'}
+      >
+        <img src={PhoneSrc} /> Phone accessories
+      </NavLink>
+      <NavLink
+        className="header-menu-item"
+        end
+        onClick={closeAside}
+        prefetch="intent"
+        style={activeLinkStyle}
+        to={'/collections/best'}
+      >
+        <img src={BestSrc} /> Best
+      </NavLink>
     </nav>
   );
 }
 
-function HeaderCtas({ setIsOpened }: { setIsOpened: (...args: any) => void }) {
+function HeaderCtas({setIsOpened}: {setIsOpened: (...args: any) => void}) {
   return (
     <nav className="header-ctas" role="navigation">
       <HeaderMenuMobileToggle />
@@ -124,30 +206,30 @@ function HeaderCtas({ setIsOpened }: { setIsOpened: (...args: any) => void }) {
 }
 
 function HeaderMenuMobileToggle() {
-  const { open } = useAside();
+  const {open} = useAside();
   return (
     <button
       className="header-menu-mobile-toggle reset"
       onClick={() => open('mobile')}
     >
-      <img src={menuSrc} />
+      <img src={menuSrc} alt="menu" />
     </button>
   );
 }
 
-function SearchToggle({ setIsOpened }: { setIsOpened: (...args: any) => void }) {
+function SearchToggle({setIsOpened}: {setIsOpened: (...args: any) => void}) {
   return (
     <button
       className="reset search-button"
-      onClick={() => setIsOpened((prevState) => !prevState)}
+      onClick={() => setIsOpened((prevState: any) => !prevState)}
     >
-      <img src={searchSrc} />
+      <img src={searchSrc} alt="search" />
     </button>
   );
 }
 
 function CartLink() {
-  const { publish, shop, cart, prevCart } = useAnalytics();
+  const {publish, shop, cart, prevCart} = useAnalytics();
 
   return (
     <Link
@@ -163,7 +245,7 @@ function CartLink() {
         } as CartViewPayload);
       }}
     >
-      <img src={cartSrc} />
+      <img src={cartSrc} alt="cart" />
     </Link>
   );
 }

@@ -9,15 +9,18 @@ import type {
   CartLineUpdateInput,
   Product,
 } from '@shopify/hydrogen/storefront-api-types';
-import { Link } from '@remix-run/react';
-import type { CartApiQueryFragment } from 'storefrontapi.generated';
-import { useVariantUrl } from '~/lib/variants';
+import {Link} from '@remix-run/react';
+import type {CartApiQueryFragment} from 'storefrontapi.generated';
+import {useVariantUrl} from '~/lib/variants';
 import classNames from 'classnames';
 import styles from './Cart.module.css';
-import { Heading } from './Heading/Heading';
-import { BuyCard } from './BuyCard';
-import { ScrollGrid } from './ScrollGrid/ScrollGrid';
-import { Grid } from './Grid/Grid';
+import {Heading} from './Heading/Heading';
+import {BuyCard} from './BuyCard';
+import {ScrollGrid} from './ScrollGrid/ScrollGrid';
+import {Grid} from './Grid/Grid';
+
+import BinSrc from '../assets/bin.svg';
+import CheckoutSrc from '../assets/images/checkout.svg';
 
 type CartLine = OptimisticCart<CartApiQueryFragment>['lines']['nodes'][0];
 
@@ -26,7 +29,7 @@ type CartMainProps = {
   recommended: any;
 };
 
-export function CartMain({ cart: originalCart, recommended }: CartMainProps) {
+export function CartMain({cart: originalCart, recommended}: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
@@ -53,16 +56,18 @@ function CartDetails({
   hidden: boolean;
 }) {
   return (
-    <div className={classNames({ [styles.hidden]: !hidden })}>
-      <Heading>Cart</Heading>
+    <div className={classNames({[styles.hidden]: !hidden})}>
+      <Heading className={styles.heading}>Cart</Heading>
       <div className={styles.cartDetails}>
         <CartLines lines={cart?.lines?.nodes} />
         <CartSummary cost={cart?.cost}>
           <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
-          <Link to="/collections/all">Continue shopping</Link>
+          <Link to="/collections/all">Continue shopping →</Link>
         </CartSummary>
         <div className={styles.recommendedProducts}>
-          <Heading>Recommended products</Heading>
+          <Heading className={styles.recommendedHeading}>
+            Recommended products
+          </Heading>
           <ScrollGrid>
             {recommended?.map((product) => (
               <BuyCard key={product.id} product={product} small={true} />
@@ -74,7 +79,7 @@ function CartDetails({
   );
 }
 
-function CartLines({ lines }: { lines: CartLine[] }) {
+function CartLines({lines}: {lines: CartLine[]}) {
   if (!lines) return null;
 
   return (
@@ -88,14 +93,22 @@ function CartLines({ lines }: { lines: CartLine[] }) {
   );
 }
 
-function CartLineItem({ line }: { line: CartLine }) {
-  const { id, merchandise } = line;
-  const { product, title, image, selectedOptions } = merchandise;
+function CartLineItem({line}: {line: CartLine}) {
+  const {id, merchandise} = line;
+  const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
 
   return (
     <li key={id} className={styles.cartLine}>
-      {image && <Image alt={title} data={image} loading="lazy" width={150} />}
+      {image && (
+        <Image
+          alt={title}
+          data={image}
+          loading="lazy"
+          width={150}
+          aspectRatio="47/77"
+        />
+      )}
 
       <div className={styles.cartLineMain}>
         <div className={styles.cartData}>
@@ -111,12 +124,12 @@ function CartLineItem({ line }: { line: CartLine }) {
   );
 }
 
-function CartCheckoutActions({ checkoutUrl }: { checkoutUrl: string }) {
+function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
   if (!checkoutUrl) return null;
 
   return (
     <a href={checkoutUrl} target="_self">
-      Check out
+      Check out <img src={CheckoutSrc} />
     </a>
   );
 }
@@ -156,18 +169,18 @@ function CartLineRemoveButton({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesRemove}
-      inputs={{ lineIds }}
+      inputs={{lineIds}}
     >
       <button disabled={disabled} className={styles.removeButton} type="submit">
-        Remove
+        <img src={BinSrc} alt="remove" />
       </button>
     </CartForm>
   );
 }
 
-function CartLineQuantity({ line }: { line: CartLine }) {
+function CartLineQuantity({line}: {line: CartLine}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const { id: lineId, quantity, isOptimistic } = line;
+  const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
@@ -175,7 +188,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
     <div className="cart-line-quantity">
       <div className={styles.cartLineButtons}>
         <div className={styles.quatityControll}>
-          <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
+          <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
             <button
               aria-label="Decrease quantity"
               disabled={quantity <= 1 || !!isOptimistic}
@@ -186,7 +199,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
             </button>
           </CartLineUpdateButton>
           <span>{quantity}</span>
-          <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
+          <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
             <button
               aria-label="Increase quantity"
               name="increase-quantity"
@@ -197,7 +210,6 @@ function CartLineQuantity({ line }: { line: CartLine }) {
             </button>
           </CartLineUpdateButton>
         </div>
-        <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
       </div>
     </div>
   );
@@ -213,7 +225,7 @@ function CartLinePrice({
   [key: string]: any;
 }) {
   if (!line?.cost?.amountPerQuantity || !line?.cost?.totalAmount)
-    return <div style={{ visibility: 'hidden' }}>&nbsp;</div>;
+    return <div style={{visibility: 'hidden'}}>&nbsp;</div>;
 
   const moneyV2 =
     priceType === 'regular'
@@ -221,12 +233,17 @@ function CartLinePrice({
       : line.cost?.compareAtAmountPerQuantity;
 
   if (moneyV2 == null) {
-    return <div style={{ visibility: 'hidden' }}>&nbsp;</div>;
+    return <div style={{visibility: 'hidden'}}>&nbsp;</div>;
   }
 
   return (
     <div className={styles.price}>
       <Money withoutTrailingZeros {...passthroughProps} data={moneyV2} />
+
+      <CartLineRemoveButton
+        lineIds={[line.id]}
+        disabled={!!line.isOptimistic}
+      />
     </div>
   );
 }
@@ -269,7 +286,7 @@ function CartDiscounts({
   const codes: string[] =
     discountCodes
       ?.filter((discount) => discount.applicable)
-      ?.map(({ code }) => code) || [];
+      ?.map(({code}) => code) || [];
 
   return (
     <div>
@@ -332,7 +349,7 @@ function CartLineUpdateButton({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesUpdate}
-      inputs={{ lines }}
+      inputs={{lines}}
     >
       {children}
     </CartForm>

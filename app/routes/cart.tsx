@@ -3,38 +3,38 @@ import {
   type MetaFunction,
   useRouteLoaderData,
   useLoaderData,
-  FetcherWithComponents,
+  type FetcherWithComponents,
 } from '@remix-run/react';
-import { Suspense } from 'react';
-import type { CartQueryDataReturn, OptimisticCartLine } from '@shopify/hydrogen';
-import { CartForm } from '@shopify/hydrogen';
+import {Suspense} from 'react';
+import type {CartQueryDataReturn, OptimisticCartLine} from '@shopify/hydrogen';
+import {CartForm} from '@shopify/hydrogen';
 import {
-  LoaderFunctionArgs,
+  type LoaderFunctionArgs,
   defer,
   json,
   type ActionFunctionArgs,
 } from '@shopify/remix-oxygen';
-import { CartMain } from '~/components/Cart';
-import type { RootLoader } from '~/root';
-import { Container } from '~/components/Container/Container';
+import {CartMain} from '~/components/Cart';
+import type {RootLoader} from '~/root';
+import {Container} from '~/components/Container/Container';
 
 export const meta: MetaFunction = () => {
-  return [{ title: `CloClips | Cart` }];
+  return [{title: `CloClips | Cart`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
 
-  return defer({ ...deferredData, ...criticalData });
+  return defer({...deferredData, ...criticalData});
 }
 
-async function loadCriticalData({ context }: LoaderFunctionArgs) {
-  const { storefront } = context;
+async function loadCriticalData({context}: LoaderFunctionArgs) {
+  const {storefront} = context;
 
-  const [{ collection }] = await Promise.all([
+  const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
-      variables: { handle: 'best' },
+      variables: {handle: 'best'},
     }),
   ]);
 
@@ -43,14 +43,14 @@ async function loadCriticalData({ context }: LoaderFunctionArgs) {
   };
 }
 
-function loadDeferredData({ context }: LoaderFunctionArgs) {
+function loadDeferredData({context}: LoaderFunctionArgs) {
   return {};
 }
 
-export async function action({ request, context }: ActionFunctionArgs) {
-  const { cart } = context;
+export async function action({request, context}: ActionFunctionArgs) {
+  const {cart} = context;
   const formData = await request.formData();
-  const { action, inputs } = CartForm.getFormInput(formData);
+  const {action, inputs} = CartForm.getFormInput(formData);
 
   if (!action) {
     throw new Error('No action provided');
@@ -95,7 +95,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   const cartId = result?.cart?.id;
   const headers = cartId ? cart.setCartId(result.cart.id) : new Headers();
-  const { cart: cartResult, errors } = result;
+  const {cart: cartResult, errors} = result;
 
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {
@@ -113,14 +113,14 @@ export async function action({ request, context }: ActionFunctionArgs) {
         cartId,
       },
     },
-    { status, headers },
+    {status, headers},
   );
 }
 
 export default function Cart() {
   const rootData = useRouteLoaderData<RootLoader>('root');
   if (!rootData) return null;
-  const { bestSellers } = useLoaderData<typeof loader>();
+  const {bestSellers} = useLoaderData<typeof loader>();
 
   return (
     <Container className="cart">
@@ -153,7 +153,7 @@ export function AddToCartButton({
   onClick?: () => void;
 }) {
   return (
-    <CartForm route="/cart" inputs={{ lines }} action={CartForm.ACTIONS.LinesAdd}>
+    <CartForm route="/cart" inputs={{lines}} action={CartForm.ACTIONS.LinesAdd}>
       {(fetcher: FetcherWithComponents<any>) => (
         <>
           <input

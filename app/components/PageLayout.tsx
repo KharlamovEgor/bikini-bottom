@@ -1,5 +1,5 @@
 import {Product} from '@shopify/hydrogen/storefront-api-types';
-import {useState} from 'react';
+import {createContext, useState} from 'react';
 import type {CartApiQueryFragment, HeaderQuery} from 'storefrontapi.generated';
 import {Aside} from '~/components/Aside';
 import {Header, HeaderMenu} from '~/components/Header';

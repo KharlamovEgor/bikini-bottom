@@ -1,0 +1,22 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1em;
+  justify-content: center;
+
+  @media (min-width: 45em) {
+    grid-template-columns: repeat(3, 330px);
+  }
+}
+
+.heading {
+  margin-bottom: 1em;
+}
+
+.wrapper {
+  margin-top: 10em;
+  margin-bottom: 3.75em;
+  @media (min-width: 45em) {
+    margin-bottom: 15em;
+  }
+}

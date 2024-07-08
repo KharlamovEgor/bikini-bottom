@@ -1,12 +1,14 @@
 import {Link} from '@remix-run/react';
-import {Image, Money} from '@shopify/hydrogen';
-import {AddToCartButton} from '../routes/cart';
-import {Product} from '~/interfaces/product.interface';
+import {Image, Money, useAnalytics} from '@shopify/hydrogen';
+import {AddToCartButton} from './AddToCartButton/AddToCartButton';
+import type {Product} from '~/interfaces/product.interface';
 import classNames from 'classnames';
 import styles from './BuyCard.module.css';
+import {RemoveFromCartButton} from './RemoveFromCartButton/RemoveFromCartButton';
 
 export function BuyCard({
   product,
+  className,
   small = false,
   mobileSmall = false,
   onClick = () => null,
@@ -17,11 +19,17 @@ export function BuyCard({
   mobileSmall?: boolean;
   onClick: (...args: any) => void;
 }): JSX.Element {
+  const {cart} = useAnalytics();
   const selectedVariant = product.variants.nodes[0];
 
+  const line = cart?.lines.nodes.find(
+    (line) => line.merchandise.id == selectedVariant.id,
+  );
+
   return (
-    <div
-      className={classNames(styles['buy-card'], {
+    <Link
+      to={`/products/${product.handle}`}
+      className={classNames(styles.buyCard, className, {
         [styles.small]: small,
         [styles.mobileSmall]: mobileSmall,
       })}
@@ -38,33 +46,55 @@ export function BuyCard({
           sizes="(min-width: 44em) 20vw, 50vw"
         />
         <div className={styles['buy-card__data']}>
-          <AddToCartButton
-            className={styles['buy-card__button']}
-            disabled={!selectedVariant.availableForSale}
-            lines={[
-              {
-                merchandiseId: selectedVariant.id,
-                quantity: 1,
-                selectedVariant,
-              },
-            ]}
-          >
-            {selectedVariant.availableForSale ? (
-              <>
-                <small className={styles['buy-card__price']}>
-                  <Money data={product.priceRange.minVariantPrice} />
-                </small>
-                <span>BUY</span>
-              </>
-            ) : (
-              <span>OUT OF STOCK</span>
-            )}
-          </AddToCartButton>
+          {line?.quantity ? (
+            <div onClick={(e) => e.stopPropagation()}>
+              <Link
+                className={classNames(
+                  styles['buy-card__button'],
+                  styles.toCart,
+                )}
+                to="/cart"
+              >
+                <span>Go to the cart</span>
+              </Link>
+            </div>
+          ) : (
+            <AddToCartButton
+              onClick={(e) => e.stopPropagation()}
+              className={styles['buy-card__button']}
+              disabled={!selectedVariant.availableForSale}
+              variant={selectedVariant}
+            >
+              {selectedVariant.availableForSale ? (
+                <>
+                  <small className={styles['buy-card__price']}>
+                    <Money data={product.priceRange.minVariantPrice} />
+                  </small>
+                  <span>BUY</span>
+                </>
+              ) : (
+                <span>OUT OF STOCK</span>
+              )}
+            </AddToCartButton>
+          )}
         </div>
       </div>
-      <Link to={`/products/${product.handle}`} onClick={onClick}>
-        <h4 className={styles['buy-card__title']}>{product.title}</h4>
-      </Link>
-    </div>
+      <h4 className={styles['buy-card__title']}>{product.title}</h4>
+    </Link>
   );
 }
+
+//<AddToCartButton
+//  onClick={(e) => e.stopPropagation()}
+//  variant={selectedVariant}
+//>
+//  +
+//</AddToCartButton>
+//<span>{line?.quantity}</span>
+//<RemoveFromCartButton
+//  onClick={(e) => e.stopPropagation()}
+//  id={line?.id}
+//  quantity={line?.quantity ?? 0}
+//>
+//  -
+//</RemoveFromCartButton>

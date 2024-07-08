@@ -1,5 +1,6 @@
 .cart {
   font-size: 1.2rem;
+  margin-bottom: 5em;
 }
 
 .cart p {
@@ -14,15 +15,28 @@
   gap: 1em;
 }
 
+.heading {
+  margin-top: 2em !important;
+  margin-bottom: 2em !important;
+}
+
 .hidden {
   display: none;
 }
 
+.links img {
+  width: 1em;
+  margin-left: 0.5em;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1rem);
+}
+
 .continueButton,
 .links a {
-  text-align: center;
-  display: block;
+  display: flex;
+  align-items: baseline;
   font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
+  justify-content: center;
+  line-height: 1;
   color: white;
   background-color: hsla(358, 100%, 78%, 1);
   padding: 1.2em 1.7em;
@@ -70,6 +84,7 @@
   background-color: hsla(0, 0%, 23%, 0.03);
   padding: 1.8em;
   border-radius: 20px;
+  align-self: start;
 }
 
 .cartSubtotals {
@@ -88,6 +103,17 @@
   display: flex;
   gap: 1em;
   align-items: center;
+}
+
+.cartLine > img {
+  border-radius: 20px;
+  color: white;
+
+  background: radial-gradient(
+    54.24% 54.24% at 52.25% 73.5%,
+    #ffffff 0%,
+    #d7c548 100%
+  );
 }
 
 .productTitle {
@@ -112,11 +138,18 @@
   font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
 }
 
+form:has(.removeButton) {
+  font-size: 0;
+}
+
 .removeButton {
-  font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
-  color: hsl(0, 0%, 23%);
   background: none;
   border: none;
+  font-size: 0;
+}
+
+.removeButton img {
+  width: clamp(1rem, 0.7423rem + 1.0997vw, 2rem);
 }
 
 .cartLineButtons {
@@ -128,6 +161,10 @@
 .price {
   font-weight: 600;
   font-size: clamp(1rem, 0.7423rem + 1.0997vw, 2rem);
+  display: flex;
+  line-height: 1;
+  align-items: baseline;
+  gap: 0.5em;
 }
 
 .cartLineMain {
@@ -139,4 +176,8 @@
 
 .recommendedProducts h2 {
   margin-bottom: 1em;
+}
+
+.recommendedHeading {
+  text-align: left !important;
 }

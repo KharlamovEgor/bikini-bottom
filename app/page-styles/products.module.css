@@ -1,0 +1,90 @@
+.product {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3em;
+  align-items: start;
+
+  @media (min-width: 45em) {
+    grid-template-columns: 1fr 1fr 500px;
+    margin-top: 8em;
+  }
+}
+
+.productImage {
+  font-size: 0;
+  position: relative;
+  border-radius: 20px;
+  color: white;
+
+  /* background: radial-gradient( */
+  /*   90.11% 90.11% at 53.98% 32.42%, */
+  /*   #ffcfd1 0%, */
+  /*   #ff8d91 100% */
+  /* ); */
+  /**/
+  background: radial-gradient(
+    54.24% 54.24% at 52.25% 73.5%,
+    #ffffff 0%,
+    #d7c548 100%
+  );
+}
+
+.productImage img {
+  height: auto;
+  border-radius: 20px;
+}
+
+.controls {
+  background-color: hsla(0, 0%, 23%, 0.03);
+  padding: 1.8em;
+  border-radius: 20px;
+  margin-bottom: 2em;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.controls a {
+  text-decoration: none !important;
+}
+
+.controls form {
+  max-width: 100%;
+}
+
+.controls form button {
+  width: 100%;
+}
+
+.controls :is(button, a) {
+  text-decoration: none;
+  border: none;
+  display: flex;
+  align-items: baseline;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
+  justify-content: center;
+  line-height: 1;
+  color: white;
+  background-color: hsla(358, 100%, 78%, 1);
+  padding: 1.2em 1.7em;
+  border-radius: 100px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.1s linear;
+
+  &:hover {
+    background-color: hsla(358, 100%, 70%, 1);
+  }
+}
+
+h2.title {
+  font-size: clamp(1.5rem, 1.1407rem + 1.5331vw, 2.8rem);
+  text-align: left;
+}
+
+.price div {
+  font-size: clamp(1.5rem, 1.1407rem + 1.5331vw, 2rem);
+  font-weight: 600;
+  color: #353535;
+}

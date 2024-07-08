@@ -1,0 +1,31 @@
+.category {
+  aspect-ratio: 330/225;
+  border: 1px solid #b7b7b7;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+  display: block;
+  width: 100%;
+  position: relative;
+  padding: 1.875em 1.5625em;
+  text-decoration: none !important;
+  transition: transform 0.2s linear;
+
+  &:hover {
+    transform: scale(0.9);
+  }
+}
+
+.category h3 {
+  font-size: 1.875rem;
+  max-width: 5em;
+  color: #353535;
+  margin: 0;
+}
+
+.category img {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 85%;
+  width: auto !important;
+}

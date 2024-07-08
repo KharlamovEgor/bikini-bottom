@@ -1,17 +1,13 @@
 import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {
-  Pagination,
-  getPaginationVariables,
-  Analytics,
-  Image,
-  Money,
-} from '@shopify/hydrogen';
+import {useLoaderData, type MetaFunction} from '@remix-run/react';
+import {Pagination, getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
-import {useVariantUrl} from '~/lib/variants';
 import {BuyCard} from '~/components/BuyCard';
-import {Heading} from '~/components/Heading/Heading';
-import {AddToCartButton} from './cart';
+import {GiftCard} from '~/components/GiftCard/GiftCard';
+
+import styles from '../page-styles/collections.module.css';
+import {Container} from '~/components/Container/Container';
+import {Grid} from '~/components/Grid/Grid';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
@@ -65,57 +61,15 @@ export default function Collection() {
 
   if (collection.title == 'Gift Card') {
     return (
-      <div className="collection container">
-        <Heading className={'giftCardHeading'}>
-          The best surprise is a gift card in CloClips Shop!
-        </Heading>
-        <div className="giftCardCollection">
-          {collection.products.nodes[0].variants.nodes.map((variant) => (
-            <Link
-              key={variant.id}
-              className={'giftCardItem'}
-              to={`/products/${variant.product.handle}`}
-            >
-              <Image
-                src={variant.image.url}
-                aspectRatio="44/77"
-                sizes="(min-width: 44em) 20vw, 50vw"
-              />
-              <div className={'giftCardMain'}>
-                <h3 className={'giftCardTitle'}>{variant.product.title}</h3>
-                <AddToCartButton
-                  className="buy-card__button"
-                  onClick={(e) => e.stopPropagation()}
-                  disabled={!variant.availableForSale}
-                  lines={[
-                    {
-                      merchandiseId: variant.id,
-                      quantity: 1,
-                      selectedVariant: variant,
-                    },
-                  ]}
-                >
-                  {variant.availableForSale ? (
-                    <>
-                      <small className={'buy-card__price'}>
-                        <Money data={variant.price} />
-                      </small>
-                      <span>BUY</span>
-                    </>
-                  ) : (
-                    <span>OUT OF STOCK</span>
-                  )}
-                </AddToCartButton>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
+      <GiftCard
+        className={styles.giftCard}
+        product={collection.products.nodes[0]}
+      />
     );
   }
 
   return (
-    <div className="collection container">
+    <Container className="collection">
       <h1 className="collection__heading">{collection.title}</h1>
       <p className="collection-description">{collection.description}</p>
       <Pagination connection={collection.products}>
@@ -143,17 +97,17 @@ export default function Collection() {
           },
         }}
       />
-    </div>
+    </Container>
   );
 }
 
 function ProductsGrid({products}: {products: ProductItemFragment[]}) {
   return (
-    <div className="products-grid">
+    <Grid>
       {products?.map((product, index) => {
         return <BuyCard key={product.id} product={product} />;
       })}
-    </div>
+    </Grid>
   );
 }
 
