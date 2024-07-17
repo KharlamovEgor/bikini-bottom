@@ -7,13 +7,15 @@
   @media (min-width: 45em) {
     grid-template-columns: 1fr 1fr 500px;
     margin-top: 8em;
+    padding-bottom: 8em;
   }
 }
 
 .productImage {
   font-size: 0;
+  aspect-ratio: 47/77;
   position: relative;
-  border-radius: 20px;
+  border-radius: 50px;
   color: white;
 
   /* background: radial-gradient( */
@@ -57,7 +59,7 @@
   width: 100%;
 }
 
-.controls :is(button, a) {
+.controls :is(.addToCart, a) {
   text-decoration: none;
   border: none;
   display: flex;
@@ -87,4 +89,174 @@ h2.title {
   font-size: clamp(1.5rem, 1.1407rem + 1.5331vw, 2rem);
   font-weight: 600;
   color: #353535;
+}
+
+div.smartButton {
+  background-color: hsla(358, 100%, 78%, 1);
+  border-radius: 100px;
+}
+
+.smartButton div div {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
+  line-height: 1;
+  align-items: center;
+  color: white;
+  font-weight: 600;
+}
+
+.smartButton form {
+}
+
+.smartButton div div button {
+  text-align: left;
+  border-radius: 100px;
+  padding: 1.2em;
+  border: none;
+  font-weight: 600;
+  background: none;
+  color: white;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
+
+  transition: background-color 0.1s linear;
+
+  &:hover {
+    background-color: hsla(358, 100%, 70%, 1);
+  }
+}
+
+.smartButton form:last-child button {
+  text-align: right;
+}
+
+.alert {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  z-index: 5;
+  background-color: white;
+  padding: 1.5em 2em;
+  box-shadow: 0 0 25px #00000011;
+  border-radius: 15px;
+  display: flex;
+  white-space: nowrap;
+  text-transform: uppercase;
+  flex-direction: column;
+  gap: 0.5em;
+  font-size: 0.8rem;
+  transition: all 0.5s linear;
+  bottom: 1em;
+
+  @media (max-width: 45em) {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  @media (min-width: 45em) {
+    font-size: 1.2rem;
+    right: 1em;
+  }
+}
+
+.alert.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.alert a {
+  background-color: hsla(358, 100%, 78%, 1);
+  color: white;
+  padding: 0.6em;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.slider {
+  width: 300px;
+  font-size: 0;
+
+  @media (min-width: 45em) {
+    width: 665px;
+  }
+}
+
+.slider .image {
+  width: calc(100%);
+  height: auto;
+  aspect-ratio: 47/77;
+  object-fit: cover;
+  border-radius: 50px !important;
+  background: radial-gradient(
+    54.24% 54.24% at 52.25% 73.5%,
+    #ffffff 0%,
+    #d7c548 100%
+  );
+}
+
+.dot {
+  font-size: 0;
+}
+
+.dot img {
+  aspect-ratio: 1;
+  width: 100px;
+  object-fit: cover;
+  background: radial-gradient(
+    54.24% 54.24% at 52.25% 73.5%,
+    #ffffff 0%,
+    #d7c548 100%
+  );
+  transition: all 0.2s ease-in-out;
+  border-radius: 5px;
+
+  &:hover {
+    filter: brightness(90%);
+  }
+}
+
+.dots {
+  display: flex;
+}
+
+.dots li {
+  width: auto;
+  height: auto;
+}
+
+.maginfierContainer {
+  position: relative;
+}
+
+.maginfierGlass {
+  position: absolute;
+  border: 3px solid #000;
+  border-radius: 10px;
+  cursor: none;
+  /*Set the size of the magnifier glass:*/
+  width: 200px;
+  height: 200px;
+}
+
+.enlarged {
+  object-fit: cover;
+  border-radius: 50px !important;
+}
+
+.enlarged img {
+  border-radius: 50px !important;
+}
+
+.hint {
+  position: absolute;
+  bottom: 25px;
+  font-size: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  background-color: #00000099;
+  padding: 1em;
+  border-radius: 50px;
+  font-weight: 400;
 }

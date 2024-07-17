@@ -35,3 +35,57 @@ div.bigContainer {
     max-width: 1830px;
   }
 }
+
+.item img {
+  height: 2.2rem;
+
+  @media (min-width: 45em) {
+    height: clamp(0.5rem, 0.2423rem + 1.0997vw, 3.1875rem);
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  line-height: 0.8;
+  padding: 0.5em;
+  gap: 0.5em;
+  font-size: clamp(0.5rem, 0.2423rem + 1.0997vw, 1.5rem);
+  text-decoration: none !important;
+  transition: color 0.2s linear;
+  border-radius: 20px;
+
+  @media (min-width: 45em) {
+    padding: 1em;
+  }
+
+  &:hover {
+    color: black !important;
+  }
+}
+
+.item span {
+  margin-top: 0.3em;
+  color: var(--color-dark, #353535) !important;
+}
+
+.item > div {
+  font-size: 0;
+}
+
+.mobileMenu .item {
+  font-size: 1.5rem;
+}
+
+.mobileMenu {
+  display: flex;
+  flex-direction: column;
+}
+
+.bold {
+  font-weight: bold;
+  color: black;
+}
+
+.active {
+}

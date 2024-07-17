@@ -1,10 +1,20 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from '@remix-run/react';
-import {Pagination, getPaginationVariables} from '@shopify/hydrogen';
+import {
+  Await,
+  useLoaderData,
+  useRouteLoaderData,
+  type MetaFunction,
+} from '@remix-run/react';
+import {
+  Pagination,
+  getPaginationVariables,
+  useOptimisticCart,
+} from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
-import {BuyCard} from '~/components/BuyCard';
+import {BuyCard} from '~/components/BuyCard/BuyCard';
 import {Grid} from '~/components/Grid/Grid';
-import {Container} from '~/components/Container/Container';
+import type {RootLoader} from '~/root';
+import {Suspense} from 'react';
 
 export const meta: MetaFunction<typeof loader> = () => {
   return [{title: `Hydrogen | Products`}];
@@ -38,6 +48,8 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Collection() {
   const {products} = useLoaderData<typeof loader>();
 
+  const rootData = useRouteLoaderData<RootLoader>('root');
+
   return (
     <div className="collection">
       <h1 className="collection__heading">Products</h1>
@@ -49,9 +61,32 @@ export default function Collection() {
               //   {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
               // </PreviousLink>
             }
-            <ProductsGrid products={nodes} />
+
+            <Suspense fallback={<ProductsGrid products={nodes} />}>
+              <Await resolve={rootData?.cart}>
+                {(cart) => {
+                  const fastCart = useOptimisticCart(cart);
+                  return (
+                    <ProductsGrid
+                      lines={fastCart?.lines.nodes}
+                      products={nodes}
+                    />
+                  );
+                }}
+              </Await>
+            </Suspense>
+
             <div className="collection__more">
-              <NextLink>
+              <NextLink
+                onClick={(e) => {
+                  e.target.classList.remove('animate');
+
+                  e.target.classList.add('animate');
+                  setTimeout(function () {
+                    e.target.classList.remove('animate');
+                  }, 700);
+                }}
+              >
                 {isLoading ? 'Loading...' : <span>Load more ↓</span>}
               </NextLink>
             </div>
@@ -62,15 +97,30 @@ export default function Collection() {
   );
 }
 
-function ProductsGrid({products}: {products: ProductItemFragment[]}) {
+function ProductsGrid({
+  products,
+  lines,
+}: {
+  products: ProductItemFragment[];
+  lines?: Array<any>;
+}) {
   return (
-    <Container>
+    <div className="container">
       <Grid>
         {products?.map((product) => {
-          return <BuyCard key={product.id} product={product} />;
+          let line;
+
+          if (lines) {
+            line = lines?.find(
+              (line) => line.merchandise.id == product.variants.nodes[0].id,
+            );
+            console.log(product);
+          }
+
+          return <BuyCard line={line} key={product.id} product={product} />;
         })}
       </Grid>
-    </Container>
+    </div>
   );
 }
 
@@ -83,6 +133,15 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    images(first: 250) {
+      nodes {
+        id
+        altText
+        url
+        width
+        height
+      }
+    }
     featuredImage {
       id
       altText

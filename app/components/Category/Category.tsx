@@ -16,7 +16,7 @@ export function Category({
       {...props}
     >
       <h3>{collection.title}</h3>
-      <Image src={collection.image?.url} />
+      <Image src={collection.image?.url} height={174} />
     </Link>
   );
 }

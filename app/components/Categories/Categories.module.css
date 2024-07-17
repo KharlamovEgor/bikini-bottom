@@ -15,7 +15,7 @@
 
 .wrapper {
   margin-top: 10em;
-  margin-bottom: 3.75em;
+  margin-bottom: 10em;
   @media (min-width: 45em) {
     margin-bottom: 15em;
   }

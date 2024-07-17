@@ -1,13 +1,24 @@
 import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from '@remix-run/react';
-import {Pagination, getPaginationVariables, Analytics} from '@shopify/hydrogen';
+import {
+  Await,
+  useLoaderData,
+  useRouteLoaderData,
+  type MetaFunction,
+} from '@remix-run/react';
+import {
+  Pagination,
+  getPaginationVariables,
+  Analytics,
+  useOptimisticCart,
+} from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
-import {BuyCard} from '~/components/BuyCard';
+import {BuyCard} from '~/components/BuyCard/BuyCard';
 import {GiftCard} from '~/components/GiftCard/GiftCard';
 
 import styles from '../page-styles/collections.module.css';
-import {Container} from '~/components/Container/Container';
 import {Grid} from '~/components/Grid/Grid';
+import type {RootLoader} from '~/root';
+import {Suspense} from 'react';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
@@ -58,31 +69,66 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
+  const rootData = useRouteLoaderData<RootLoader>('root');
 
-  if (collection.title == 'Gift Card') {
+  if (collection.title == 'Gift Cards') {
     return (
-      <GiftCard
-        className={styles.giftCard}
-        product={collection.products.nodes[0]}
-      />
+      <Suspense
+        fallback={
+          <GiftCard
+            className={styles.giftCard}
+            product={collection.products.nodes[0]}
+          />
+        }
+      >
+        <Await resolve={rootData?.cart}>
+          {(cart) => {
+            const fastCart = useOptimisticCart(cart);
+            return (
+              <GiftCard
+                className={styles.giftCard}
+                lines={fastCart?.lines.nodes}
+                product={collection.products.nodes[0]}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
     );
   }
 
   return (
-    <Container className="collection">
+    <div className="collection container">
       <h1 className="collection__heading">{collection.title}</h1>
       <p className="collection-description">{collection.description}</p>
       <Pagination connection={collection.products}>
-        {({nodes, isLoading, PreviousLink, NextLink}) => (
+        {({nodes, isLoading, NextLink}) => (
           <>
-            {
-              // <PreviousLink>
-              //   {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-              // </PreviousLink>
-            }
-            <ProductsGrid products={nodes} />
+            <Suspense fallback={<ProductsGrid products={nodes} />}>
+              <Await resolve={rootData?.cart}>
+                {(cart) => {
+                  const fastCart = useOptimisticCart(cart);
+                  return (
+                    <ProductsGrid
+                      lines={fastCart?.lines.nodes}
+                      products={nodes}
+                    />
+                  );
+                }}
+              </Await>
+            </Suspense>
+
             <div className="collection__more">
-              <NextLink>
+              <NextLink
+                onClick={(e) => {
+                  e.target.classList.remove('animate');
+
+                  e.target.classList.add('animate');
+                  setTimeout(function () {
+                    e.target.classList.remove('animate');
+                  }, 700);
+                }}
+              >
                 {isLoading ? 'Loading...' : <span>Load more ↓</span>}
               </NextLink>
             </div>
@@ -97,17 +143,33 @@ export default function Collection() {
           },
         }}
       />
-    </Container>
+    </div>
   );
 }
 
-function ProductsGrid({products}: {products: ProductItemFragment[]}) {
+function ProductsGrid({
+  products,
+  lines,
+}: {
+  products: ProductItemFragment[];
+  lines?: Array<any>;
+}) {
   return (
-    <Grid>
-      {products?.map((product, index) => {
-        return <BuyCard key={product.id} product={product} />;
-      })}
-    </Grid>
+    <div className="container">
+      <Grid>
+        {products?.map((product) => {
+          let line;
+
+          if (lines) {
+            line = lines?.find(
+              (line) => line.merchandise.id == product.variants.nodes[0].id,
+            );
+          }
+
+          return <BuyCard line={line} key={product.id} product={product} />;
+        })}
+      </Grid>
+    </div>
   );
 }
 
@@ -126,6 +188,15 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       url
       width
       height
+    }
+    images(first: 250) {
+      nodes {
+        id
+        altText
+        url
+        width
+        height
+      }
     }
     priceRange {
       minVariantPrice {

@@ -8,10 +8,11 @@ import {Background} from '../Background/Background';
 export function GiftCard({
   product,
   className,
+  lines,
   ...props
 }: GiftCardProps): JSX.Element {
   return (
-    <Background>
+    <Background className={styles.background}>
       <div
         className={classNames(styles.giftCard, className, 'container')}
         {...props}
@@ -20,9 +21,15 @@ export function GiftCard({
           The best surprise is a gift card in CloClips Shop!
         </Heading>
         <div className={styles.collection}>
-          {product.variants.nodes.map((variant) => (
-            <VariantCard key={variant.id} variant={variant} />
-          ))}
+          {product.variants.nodes.map((variant) => {
+            let line;
+            if (lines) {
+              line = lines?.find((line) => line.merchandise.id == variant.id);
+            }
+            return (
+              <VariantCard line={line} key={variant.id} variant={variant} />
+            );
+          })}
         </div>
       </div>
     </Background>

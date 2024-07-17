@@ -1,5 +1,5 @@
-import {DetailedHTMLProps, HTMLAttributes} from 'react';
-import {Product} from '@shopify/hydrogen/storefront-api-types';
+import type {DetailedHTMLProps, HTMLAttributes} from 'react';
+import type {Product} from '@shopify/hydrogen/storefront-api-types';
 
 export interface CustomSearchProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {

@@ -1,28 +1,40 @@
 import {CartForm} from '@shopify/hydrogen';
 import type {AddToCartButtonProps} from './AddToCartButton.props';
+import {FetcherWithComponents} from '@remix-run/react';
 
 export function AddToCartButton({
-  variant,
+  analytics,
   children,
+  disabled,
+  variant,
   ...props
-}: AddToCartButtonProps): JSX.Element {
+}: AddToCartButtonProps) {
   return (
     <CartForm
       route="/cart"
       inputs={{
         lines: [
-          {
-            merchandiseId: variant.id,
-            quantity: 1,
-            selectedVariant: variant,
-          },
+          {merchandiseId: variant.id, quantity: 1, selectedVariant: variant},
         ],
       }}
       action={CartForm.ACTIONS.LinesAdd}
     >
-      <button {...props} type="submit">
-        {children}
-      </button>
+      {(fetcher: FetcherWithComponents<any>) => (
+        <>
+          <input
+            name="analytics"
+            type="hidden"
+            value={JSON.stringify(analytics)}
+          />
+          <button
+            {...props}
+            type="submit"
+            disabled={disabled ?? fetcher.state !== 'idle'}
+          >
+            {children}
+          </button>
+        </>
+      )}
     </CartForm>
   );
 }

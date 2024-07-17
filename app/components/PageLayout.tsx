@@ -1,8 +1,8 @@
-import {Product} from '@shopify/hydrogen/storefront-api-types';
-import {createContext, useState} from 'react';
+import {useState} from 'react';
 import type {CartApiQueryFragment, HeaderQuery} from 'storefrontapi.generated';
 import {Aside} from '~/components/Aside';
 import {Header, HeaderMenu} from '~/components/Header';
+import {Background} from './Background/Background';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -22,7 +22,6 @@ export function PageLayout({
   publicStoreDomain,
 }: PageLayoutProps) {
   const [isOpened, setIsOpened] = useState<boolean>(false);
-
   return (
     <Aside.Provider>
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
@@ -38,7 +37,31 @@ export function PageLayout({
         />
       )}
       <main onClick={() => setIsOpened(false)}>{children}</main>
+      <Footer />
     </Aside.Provider>
+  );
+}
+
+function Footer(): JSX.Element {
+  return (
+    <footer>
+      <div className="container footer">
+        <span>CloClips Shop - 2024</span>
+        <div className="footerLinks">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Return Policy</a>
+          <a href="#">Shipping Policy</a>
+          <a href="#">Oferta</a>
+        </div>
+        <div className="footerContacts">
+          <h4>Contact Information</h4>
+          <ul>
+            <li>E-mail: maxbobshopify@gmail.com</li>
+            <li>WhatsApp: +66 82 251 3630</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
   );
 }
 
@@ -52,14 +75,19 @@ function MobileMenuAside({
   return (
     header.menu &&
     header.shop.primaryDomain?.url && (
-      <Aside type="mobile" heading="MENU">
-        <HeaderMenu
-          menu={header.menu}
-          viewport="mobile"
-          primaryDomainUrl={header.shop.primaryDomain.url}
-          publicStoreDomain={publicStoreDomain}
-        />
+      <Aside type="mobile">
+        <div style={{padding: '1rem'}}>
+          <HeaderMenu
+            menu={header.menu}
+            viewport="mobile"
+            primaryDomainUrl={header.shop.primaryDomain.url}
+            publicStoreDomain={publicStoreDomain}
+          />
+        </div>
       </Aside>
     )
   );
 }
+//<Background menu style={{padding: '1rem', height: '100%'}}>
+
+//</Background>

@@ -3,13 +3,9 @@ import type {VariantCardProps} from './VariantCard.props';
 import {Image, Money, useAnalytics} from '@shopify/hydrogen';
 import {AddToCartButton} from '../AddToCartButton/AddToCartButton';
 import styles from './VariantCard.module.css';
-import classNames from 'classnames';
+import {CartLineQuantity} from '../Cart';
 
-export function VariantCard({variant, ...props}: VariantCardProps) {
-  const {cart} = useAnalytics();
-  const line = cart?.lines.nodes.find(
-    (line) => line.merchandise.id == variant.id,
-  );
+export function VariantCard({variant, line, ...props}: VariantCardProps) {
   return (
     <Link
       className={styles.variantCard}
@@ -19,19 +15,23 @@ export function VariantCard({variant, ...props}: VariantCardProps) {
       <Image
         src={variant.image.url}
         aspectRatio="44/77"
-        sizes="(min-width: 44em) 20vw, 50vw"
+        sizes="(min-width: 45em) 290px, 300px"
       />
       <div className={styles.main}>
         <h3
           className={styles.title}
         >{`${variant.product.title} for ${variant.price.amount}$`}</h3>
-        {line?.quantity ? (
+        {line ? (
           <div onClick={(e) => e.stopPropagation()}>
+            <CartLineQuantity className={styles.smartButton} line={line} />
             <Link
-              className={classNames(styles.button, styles.toCart)}
+              className={styles.link}
               to="/cart"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             >
-              Go to the cart
+              <span>View my cart</span>
             </Link>
           </div>
         ) : (

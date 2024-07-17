@@ -35,7 +35,17 @@ export default defineConfig({
        * Include 'example-dep' in the array below.
        * @see https://vitejs.dev/config/dep-optimization-options
        */
-      include: ['react-slick', 'classnames'],
+      include: [
+        'fast-deep-equal',
+        'react-required-if',
+        'clamp',
+        'object.omit',
+        'prop-types',
+        'object-assign',
+        'detect-it',
+        'react-slick',
+        'classnames',
+      ],
     },
   },
 });

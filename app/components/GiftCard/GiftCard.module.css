@@ -28,3 +28,7 @@
   height: auto;
   border-radius: 20px;
 }
+
+.background {
+  overflow: hidden;
+}

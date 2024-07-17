@@ -143,6 +143,7 @@ export function AddToCartButton({
   children,
   disabled,
   lines,
+  className,
   onClick,
   ...props
 }: {
@@ -150,6 +151,7 @@ export function AddToCartButton({
   children: React.ReactNode;
   disabled?: boolean;
   lines: Array<OptimisticCartLine>;
+  className: string;
   onClick?: () => void;
 }) {
   return (
@@ -163,6 +165,7 @@ export function AddToCartButton({
           />
           <button
             {...props}
+            className={className}
             type="submit"
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}
@@ -184,6 +187,15 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    images(first: 250) {
+      nodes {
+        id
+        altText
+        url
+        width
+        height
+      }
+    }
     featuredImage {
       id
       altText

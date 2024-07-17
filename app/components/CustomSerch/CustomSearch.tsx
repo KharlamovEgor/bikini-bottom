@@ -1,12 +1,11 @@
 import classNames from 'classnames';
-import {CustomSearchProps} from './CustomSearch.props';
+import type {CustomSearchProps} from './CustomSearch.props';
 import styles from './CustomSearch.module.css';
 import {useEffect, useState} from 'react';
-import {BuyCard} from '../BuyCard';
+import {BuyCard} from '../BuyCard/BuyCard';
 import {Container} from '../Container/Container';
-import {Product} from '@shopify/hydrogen/storefront-api-types';
+import type {Product} from '@shopify/hydrogen/storefront-api-types';
 
-import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import {ScrollGrid} from '../ScrollGrid/ScrollGrid';
@@ -21,6 +20,14 @@ export function CustomSearch({
   const [searchReq, setSearchReq] = useState<string>('');
   const [data, setData] = useState<Array<Product>>([]);
   const [loadedData, setLoadedData] = useState<Array<Product>>([]);
+
+  useEffect(() => {
+    if (isOpened) {
+      document.documentElement.style.overflowY = 'hidden';
+    } else {
+      document.documentElement.style.overflowY = 'visible';
+    }
+  }, [isOpened]);
 
   useEffect(() => {
     async function load() {
@@ -47,17 +54,19 @@ export function CustomSearch({
         {...props}
       >
         <Container className={styles.container}>
-          <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="text"
-              value={searchReq}
-              onChange={(e) => setSearchReq(e.target.value)}
-              placeholder="Search..."
-            />
-          </form>
-          {globalThis?.innerWidth > 700 && data.length > 6 ? (
-            <SimpleSlider
-              chidren={data?.map((product) => (
+          <div className={styles.controls}>
+            <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+              <input
+                type="text"
+                value={searchReq}
+                onChange={(e) => setSearchReq(e.target.value)}
+                placeholder="Search..."
+              />
+            </form>
+          </div>
+          {globalThis?.innerWidth > 700 && (
+            <SearchGrid>
+              {data?.map((product) => (
                 <div key={product.id} className={styles.cardContainer}>
                   <BuyCard
                     className={styles.card}
@@ -67,9 +76,10 @@ export function CustomSearch({
                   />
                 </div>
               ))}
-            />
-          ) : (
-            <ScrollGrid className={styles.grid}>
+            </SearchGrid>
+          )}
+          {globalThis.innerWidth <= 700 && (
+            <SearchGrid className={styles.grid}>
               {data?.map((product) => (
                 <BuyCard
                   key={product.id}
@@ -79,32 +89,16 @@ export function CustomSearch({
                   onClick={() => setIsOpened(false)}
                 />
               ))}
-            </ScrollGrid>
+            </SearchGrid>
           )}
-
-          {
-            //data.length == 4 && (
-            //   <Link
-            //     onClick={() => setIsOpened(false)}
-            //     to={'/search?q=' + searchReq}
-            //   >
-            //     View more
-            //   </Link>
-            //)
-          }
         </Container>
       </div>
     </div>
   );
 }
 
-export default function SimpleSlider({chidren}) {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 6,
-    slidesToScroll: 4,
-  };
-  return <Slider {...settings}>{chidren}</Slider>;
+function SearchGrid({children, className}) {
+  return (
+    <div className={classNames(styles.searhGrid, className)}>{children}</div>
+  );
 }

@@ -1,11 +1,17 @@
 import classNames from 'classnames';
-import {GridProps} from './Grid.props';
+import type {GridProps} from './Grid.props';
 import styles from './Grid.module.css';
+import {motion} from 'framer-motion';
 
 export function Grid({children, className, ...props}: GridProps) {
   return (
-    <div className={classNames(styles.grid, className)} {...props}>
+    <motion.div
+      layout
+      animate={{height: 'auto'}}
+      className={classNames(styles.grid, className)}
+      {...props}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }

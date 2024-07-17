@@ -1,0 +1,103 @@
+.hero {
+  overflow: hidden;
+  border-radius: 60px;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  background-image: url('./sandy.webp');
+  background-repeat: no-repeat;
+  background-size: auto 900px;
+  width: 900px;
+  height: 900px;
+  left: -8%;
+  bottom: -23%;
+  animation-fill-mode: forwards !important;
+  transform: translateX(-100%);
+  isolation: isolate;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  background-image: url('./patrik.webp');
+  background-repeat: no-repeat;
+  background-size: auto 900px;
+  width: 900px;
+  height: 900px;
+  right: -10%;
+  bottom: -20%;
+  animation-fill-mode: forwards !important;
+  transform: translateX(100%);
+  isolation: isolate;
+}
+
+@media (max-width: 720px) {
+  .hero::after,
+  .hero::before {
+    width: 338px;
+    height: 338px;
+    background-size: auto 338px;
+  }
+
+  .hero::before {
+    bottom: -12%;
+    left: -45%;
+  }
+
+  .hero::after {
+    bottom: -10%;
+    right: -46%;
+  }
+}
+
+.hero.animate::after,
+.hero.animate::before {
+  animation: appearance 1s ease-out;
+}
+
+@keyframes appearance {
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.link {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 207px;
+  top: 52%;
+  z-index: 5;
+
+  @media (min-width: 45em) {
+    top: 39%;
+    width: 460px;
+  }
+}
+
+.link img {
+  width: 100%;
+  filter: drop-shadow(0px 0px 10px #b0fff6);
+  transition: all 0.2s linear;
+  animation: blink 2s linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+  0% {
+    filter: drop-shadow(0px 0px 10px #b0fff6);
+  }
+  50% {
+    filter: drop-shadow(0px 0px 0px #b0fff6);
+  }
+  100% {
+    filter: drop-shadow(0px 0px 10px #b0fff6);
+  }
+}
+
+.link:hover img {
+  filter: none;
+}

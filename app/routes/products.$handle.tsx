@@ -1,4 +1,4 @@
-import {Suspense} from 'react';
+import {Suspense, useEffect, useState} from 'react';
 import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {
   Await,
@@ -6,6 +6,7 @@ import {
   useLoaderData,
   type MetaFunction,
   type FetcherWithComponents,
+  useRouteLoaderData,
 } from '@remix-run/react';
 import type {
   ProductFragment,
@@ -23,14 +24,19 @@ import {
   Analytics,
   type CartViewPayload,
   useAnalytics,
+  useOptimisticCart,
 } from '@shopify/hydrogen';
 import type {SelectedOption} from '@shopify/hydrogen/storefront-api-types';
 import {getVariantUrl} from '~/lib/variants';
 
 import styles from '../page-styles/products.module.css';
 import classNames from 'classnames';
-import {Container} from '~/components/Container/Container';
 import {Heading} from '~/components/Heading/Heading';
+import {Background} from '~/components/Background/Background';
+import type {RootLoader} from '~/root';
+import {CartLineQuantity} from '~/components/Cart';
+import Slider from 'react-slick';
+import ReactImageMagnify from 'react-image-magnify';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.product.title ?? ''}`}];
@@ -127,65 +133,229 @@ function redirectToFirstVariant({
 export default function Product() {
   const {product, variants} = useLoaderData<typeof loader>();
   const {selectedVariant} = product;
+  const rootData = useRouteLoaderData<RootLoader>('root');
+
   return (
-    <Container className={classNames(styles.product)}>
-      <ProductImage image={selectedVariant?.image} />
-      <ProductMain
-        selectedVariant={selectedVariant}
-        product={product}
-        variants={variants}
-      />
-      <ProductControls selectedVariant={selectedVariant} />
-      <Analytics.ProductView
-        data={{
-          products: [
-            {
-              id: product.id,
-              title: product.title,
-              price: selectedVariant?.price.amount || '0',
-              vendor: product.vendor,
-              variantId: selectedVariant?.id || '',
-              variantTitle: selectedVariant?.title || '',
-              quantity: 1,
-            },
-          ],
-        }}
-      />
-    </Container>
+    <Background>
+      <div className={classNames(styles.product, 'container')}>
+        {product.images.nodes.length > 1 && globalThis?.innerWidth <= 700 && (
+          <Slider
+            dots
+            infinite
+            speed={500}
+            slidesToScroll={1}
+            arrows={false}
+            slidesToShow={1}
+            className={styles.slider}
+          >
+            {product.images.nodes.map((image) => (
+              <Image
+                key={image.id}
+                id={image.id}
+                className={classNames(styles.image)}
+                data={image}
+                sizes="(min-width: 45em) 50vw, 100vw"
+                aspectRatio="47/77"
+              />
+            ))}
+          </Slider>
+        )}
+        {product.images.nodes.length > 1 && globalThis?.innerWidth > 700 && (
+          <Slider
+            dots
+            infinite
+            speed={500}
+            slidesToScroll={1}
+            arrows={false}
+            slidesToShow={1}
+            className={styles.slider}
+            appendDots={(dots) => {
+              return (
+                <div>
+                  <ul className={styles.dots}>{dots}</ul>
+                </div>
+              );
+            }}
+            customPaging={(i) => {
+              return (
+                <div className={styles.dot}>
+                  <img src={product.images.nodes[i].url} alt="" />
+                </div>
+              );
+            }}
+          >
+            {product.images.nodes.map((image) => (
+              <div key={image.id}>
+                <ReactImageMagnify
+                  imageClassName={styles.image}
+                  enlargedImageClassName={styles.enlarged}
+                  smallImage={{
+                    isFluidWidth: true,
+                    src: image.url,
+                  }}
+                  largeImage={{
+                    src: image.url,
+                    width: 1330,
+                    height: 2180,
+                  }}
+                  lensStyle={{backgroundColor: 'rgba(0,0,0,.6)'}}
+                  isHintEnabled={true}
+                  shouldHideHintAfterFirstActivation={false}
+                  enlargedImagePosition="over"
+                  hintComponent={() => (
+                    <div className={styles.hint}>
+                      <span>Hover to Zoom</span>
+                    </div>
+                  )}
+                />
+                {
+                  //<Image
+                  //  id={image.id}
+                  //  className={classNames(styles.image)}
+                  //  data={image}
+                  //  sizes="(min-width: 45em) 50vw, 100vw"
+                  //  aspectRatio="47/77"
+                  ///>
+                }
+              </div>
+            ))}
+          </Slider>
+        )}{' '}
+        {product.images.nodes.length == 1 && globalThis.innerWidth > 700 && (
+          <ReactImageMagnify
+            imageClassName={styles.productImage}
+            enlargedImageClassName={styles.enlarged}
+            smallImage={{
+              isFluidWidth: true,
+              src: product.variants.nodes[0].image.url,
+            }}
+            largeImage={{
+              src: product.variants.nodes[0].image.url,
+              width: 1330,
+              height: 2180,
+            }}
+            lensStyle={{backgroundColor: 'rgba(0,0,0,.6)'}}
+            isHintEnabled={true}
+            shouldHideHintAfterFirstActivation={false}
+            enlargedImagePosition="over"
+            enlargedImageStyle={{borderRadius: 50}}
+            enlargedImageContainerStyle={{borderRadius: 50}}
+            hintComponent={() => (
+              <div className={styles.hint}>
+                <span>Hover to Zoom</span>
+              </div>
+            )}
+          />
+        )}
+        {product.images.nodes.length == 1 && globalThis.innerWidth <= 700 && (
+          <ProductImage image={product.variants.nodes[0].image} />
+        )}
+        <ProductMain
+          selectedVariant={selectedVariant}
+          product={product}
+          variants={variants}
+        />
+        <Suspense>
+          <Await resolve={rootData.cart}>
+            {(cart) => {
+              const optimisticCart = useOptimisticCart(cart);
+              const lines = optimisticCart?.lines.nodes;
+              const line = lines?.find(
+                (line) => line.merchandise.id == selectedVariant.id,
+              );
+
+              return (
+                <ProductControls
+                  selectedVariant={selectedVariant}
+                  line={line}
+                />
+              );
+            }}
+          </Await>
+        </Suspense>
+        <Analytics.ProductView
+          data={{
+            products: [
+              {
+                id: product.id,
+                title: product.title,
+                price: selectedVariant?.price.amount || '0',
+                vendor: product.vendor,
+                variantId: selectedVariant?.id || '',
+                variantTitle: selectedVariant?.title || '',
+                quantity: 1,
+              },
+            ],
+          }}
+        />
+      </div>
+    </Background>
   );
 }
 
-function ProductControls({selectedVariant}) {
-  const {cart, prevCart, shop, publish} = useAnalytics();
+function ProductControls({selectedVariant, line}) {
+  const {prevCart, shop, publish, cart} = useAnalytics();
+  const [showAlert, setShowAlert] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 5000);
+  }, [showAlert]);
+
   return (
-    <div className={styles.controls}>
-      <ProductPrice selectedVariant={selectedVariant} />
-      <AddToCartButton
-        disabled={!selectedVariant || !selectedVariant.availableForSale}
-        onClick={() => {
-          publish('cart_viewed', {
-            cart,
-            prevCart,
-            shop,
-            url: window.location.href || '',
-          } as CartViewPayload);
-        }}
-        lines={
-          selectedVariant
-            ? [
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity: 1,
-                  selectedVariant,
-                },
-              ]
-            : []
-        }
+    <>
+      <div className={styles.controls}>
+        <ProductPrice selectedVariant={selectedVariant} />
+        {line ? (
+          <CartLineQuantity line={line} className={styles.smartButton} />
+        ) : (
+          <AddToCartButton
+            className={styles.addToCart}
+            disabled={!selectedVariant || !selectedVariant.availableForSale}
+            onClick={(e) => {
+              setShowAlert(true);
+              publish('cart_viewed', {
+                cart,
+                prevCart,
+                shop,
+                url: window.location.href || '',
+              } as CartViewPayload);
+            }}
+            lines={
+              selectedVariant
+                ? [
+                    {
+                      merchandiseId: selectedVariant.id,
+                      quantity: 1,
+                      selectedVariant,
+                    },
+                  ]
+                : []
+            }
+          >
+            {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
+          </AddToCartButton>
+        )}
+        <Link to="/collections/all">Continue shopping →</Link>
+      </div>
+      <div
+        onClick={() => setShowAlert(false)}
+        className={classNames(styles.alert, {
+          [styles.show]: showAlert,
+        })}
       >
-        {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
-      </AddToCartButton>
-      <Link to="/collections/all">Continue shopping →</Link>
-    </div>
+        <span>Success! Item added to cart!</span>
+        <Link
+          to="/cart"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <span>View my cart</span>
+        </Link>
+      </div>
+    </>
   );
 }
 
@@ -329,12 +499,14 @@ function AddToCartButton({
   children,
   disabled,
   lines,
+  className,
   onClick,
 }: {
   analytics?: unknown;
   children: React.ReactNode;
   disabled?: boolean;
   lines: Array<OptimisticCartLine>;
+  className: string;
   onClick?: () => void;
 }) {
   return (
@@ -347,6 +519,7 @@ function AddToCartButton({
             value={JSON.stringify(analytics)}
           />
           <button
+            className={className}
             type="submit"
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}
@@ -404,6 +577,16 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    images(first: 250) {
+      nodes {
+        __typename
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
     options {
       name
       values

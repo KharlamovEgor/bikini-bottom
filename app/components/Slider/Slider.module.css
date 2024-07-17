@@ -1,33 +1,161 @@
 .slide {
   position: relative;
-  overflow: hidden;
-  background-image: url('./slide-1-mobile.png');
-  background-size: 500px;
+  background-image: url('./slide-1-mobile.webp');
   background-position: center top;
   color: white;
-  height: 730px;
+  height: 720px;
+  background-size: auto 666px;
 
   background-repeat: no-repeat;
 
   @media (min-width: 45em) {
+    overflow: hidden;
     height: auto;
     aspect-ratio: 1920/1115;
-    background-image: url('./slide-1-full.png');
+    background-image: url('./slide-1-full.webp');
     background-size: 100%;
+  }
+}
+
+.slide::before {
+  content: '';
+  position: absolute;
+  background-image: url('./patric.png');
+  background-repeat: no-repeat;
+  background-size: 900px 900px;
+  width: 900px;
+  height: 900px;
+  top: 22%;
+  left: -1.5%;
+  transform: translateY(120%);
+  z-index: 5;
+}
+
+.slide::after {
+  content: '';
+  position: absolute;
+  background-image: url('./spongebob.png');
+  background-repeat: no-repeat;
+  background-size: auto 988px;
+  width: 988px;
+  height: 988px;
+  top: 0;
+  right: -7%;
+  transform: translateY(120%);
+  z-index: 5;
+}
+
+.slide.animate::before {
+  animation: appearance 1s ease-out;
+  animation-fill-mode: forwards;
+}
+
+.slide.animate::after {
+  animation-fill-mode: forwards !important;
+  animation: appearance 1s ease-out;
+}
+
+.slide.duration::before {
+  animation-fill-mode: forwards !important;
+  animation-delay: 3s !important;
+  animation: appearance 1s ease-out;
+}
+
+.slide.duration::after {
+  animation-fill-mode: forwards !important;
+  animation-delay: 3s !important;
+  animation: appearance 1s ease-out;
+}
+
+@keyframes appearance {
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .slide::before {
+    width: 303px;
+    height: 303px;
+    background-size: auto 303px;
+    top: 47%;
+    left: -50%;
+    transform: translateX(-100%);
+  }
+
+  .slide::after {
+    transform: translateX(100%);
+    width: 371px;
+    height: 371px;
+    background-size: auto 371px;
+    top: 49%;
+    right: -45%;
   }
 }
 
 .link a {
   position: absolute;
-  width: 6em;
-  height: 5em;
-  top: 45%;
+  width: 206px;
+  top: 39%;
   left: 50%;
   transform: translate(-50%);
 
   @media (min-width: 45em) {
-    width: 20em;
-    height: 10em;
-    top: 60%;
+    width: 458px;
+    top: 54%;
+  }
+}
+
+.link img {
+  width: 100%;
+  filter: drop-shadow(0px 0px 10px #b0fff6);
+  transition: all 0.2s linear;
+  animation: blink 2s linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+  0% {
+    filter: drop-shadow(0px 0px 10px #b0fff6);
+  }
+  50% {
+    filter: drop-shadow(0px 0px 0px #b0fff6);
+  }
+  100% {
+    filter: drop-shadow(0px 0px 10px #b0fff6);
+  }
+}
+
+.link a:hover img {
+  filter: none;
+}
+
+.text {
+  left: 50%;
+  transform: translateX(-50%) translateY(-150%);
+  position: absolute;
+  width: 275px;
+  top: 10%;
+
+  @media (min-width: 45em) {
+    top: 5%;
+    width: 732px !important;
+  }
+}
+
+.text.animate {
+  animation: appearance-down 1s ease-out;
+  animation-fill-mode: forwards;
+}
+
+.text.duration {
+  animation-fill-mode: forwards !important;
+  animation-delay: 3s !important;
+  animation: appearance-down 1s ease-out;
+}
+
+@keyframes appearance-down {
+  100% {
+    transform: translateX(-50%) translateY(0);
   }
 }

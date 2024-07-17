@@ -66,7 +66,78 @@
 
 .toCart {
   text-transform: uppercase;
-  color: #ff8d91;
   text-decoration: none !important;
+}
+
+.toCart span {
+  color: #ff8d91;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+div.smartButton {
+  background-color: hsla(358, 100%, 78%, 1);
+  background-color: white;
+  border-radius: 100px;
+}
+
+.smartButton div div {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
   line-height: 1;
+  align-items: center;
+  color: black;
+  font-weight: 600;
+}
+
+.smartButton form {
+}
+
+.smartButton div div button {
+  text-align: left;
+  border-radius: 100px;
+  border: none;
+  font-weight: 600;
+  background: none;
+  color: black;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
+
+  padding: 0.8em;
+  @media (min-width: 45em) {
+    padding: 0.5em;
+  }
+
+  transition: background-color 0.1s linear;
+
+  &:hover {
+    background-color: hsla(358, 0%, 95%, 1);
+  }
+}
+
+.smartButton form:last-child button {
+  text-align: right;
+}
+
+a.link {
+  font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
+  color: white;
+  text-align: center;
+  background-color: hsla(358, 100%, 78%, 1);
+  width: 100%;
+  display: block;
+  margin-top: 0.5em;
+  border-radius: 50px;
+  transition: all 0.2s linear;
+  text-decoration: none;
+
+  padding: 0.8em;
+  @media (min-width: 45em) {
+    padding: 0.5em;
+  }
+
+  &:hover {
+    background-color: hsla(358, 100%, 68%, 1);
+  }
 }

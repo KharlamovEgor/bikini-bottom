@@ -16,6 +16,16 @@ export const PRODUCT_ITEM_FRAGMENT = `#graphql
     }
     id
     handle
+    images(first: 250) {
+      nodes {
+        id
+        altText
+        url
+        width
+        height
+        __typename
+      }
+    }
     title
     featuredImage {
       id

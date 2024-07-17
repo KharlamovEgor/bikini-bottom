@@ -1,0 +1,271 @@
+.buyCard {
+  text-decoration: none !important;
+  transition: transform 0.2s linear;
+
+  &:hover {
+    transform: scale(0.95);
+  }
+}
+
+.price {
+  font-size: clamp(1rem, 0.8711rem + 0.5498vw, 1.5rem);
+  font-size: 1.5rem;
+}
+
+.small .price {
+  font-size: 1rem;
+}
+
+@media (max-width: 720px) {
+  .mobileSmall .price {
+    font-size: 1rem;
+  }
+}
+
+.imageContainer img {
+  border-radius: 20px;
+}
+
+.buyCard img {
+  height: auto;
+}
+
+.title {
+  margin-top: 1.2em;
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-align: center;
+  color: #353535;
+}
+
+.small .title {
+  font-size: 1rem;
+
+  @media (min-width: 45em) {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .mobileSmall .title {
+    font-size: 1rem;
+  }
+}
+
+.imageContainer {
+  font-size: 0;
+}
+
+.data {
+  position: absolute;
+  padding: 10px;
+  width: 100%;
+  bottom: 0;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.button {
+  background-color: white;
+  width: 100%;
+
+  padding-top: 1.4em;
+  padding-bottom: 1.3em;
+
+  border: none;
+  border-radius: 100px;
+
+  transition: all 0.2s linear;
+
+  font-weight: 500;
+  font-size: clamp(1rem, 0.8711rem + 0.5498vw, 1.5rem);
+
+  display: flex;
+  justify-content: center;
+  gap: 0.33em;
+}
+
+@media (max-width: 750px) {
+  .mobileSmall .button {
+    font-size: 1rem;
+  }
+}
+
+.small .button {
+  font-size: 1rem;
+}
+
+.button:hover {
+  background-color: #eeeeee;
+}
+
+.button:disabled {
+  background-color: white;
+}
+
+.price {
+  color: #ff8d91;
+}
+
+.button span {
+  font-size: 1.5rem;
+  color: #353535;
+}
+
+.small .button span {
+  font-size: 1rem;
+}
+
+@media (max-width: 750px) {
+  .mobileSmall .button span {
+    font-size: 1rem;
+  }
+}
+
+.imageContainer {
+  position: relative;
+  border-radius: 20px;
+  color: white;
+
+  background: radial-gradient(
+    54.24% 54.24% at 52.25% 73.5%,
+    #ffffff 0%,
+    #d7c548 100%
+  );
+}
+
+.toCart {
+  text-transform: uppercase;
+  text-decoration: none !important;
+}
+
+.toCart span {
+  color: #ff8d91;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+a.link {
+  font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
+  color: white;
+  background-color: hsla(358, 100%, 78%, 1);
+  width: 100%;
+  display: block;
+  margin-top: 0.5em;
+  border-radius: 50px;
+  transition: all 0.2s linear;
+  text-decoration: none;
+
+  padding: 0.8em;
+  @media (min-width: 45em) {
+    padding: 0.5em;
+  }
+
+  &:hover {
+    background-color: hsla(358, 100%, 68%, 1);
+  }
+}
+
+.alert {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  z-index: 5;
+  background-color: white;
+  padding: 1.5em 2em;
+  box-shadow: 0 0 25px #00000011;
+  border-radius: 15px;
+  display: flex;
+  white-space: nowrap;
+  text-transform: uppercase;
+  flex-direction: column;
+  gap: 0.5em;
+  font-size: 0.8rem;
+  transition: all 0.5s linear;
+  bottom: 1em;
+
+  @media (max-width: 45em) {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  @media (min-width: 45em) {
+    font-size: 1.2rem;
+    right: 1em;
+  }
+}
+
+.alert.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.alert a {
+  background-color: hsla(358, 100%, 78%, 1);
+  color: white;
+  padding: 0.6em;
+  border-radius: 20px;
+  text-align: center;
+}
+
+div.smartButton {
+  background-color: hsla(358, 100%, 78%, 1);
+  background-color: white;
+  border-radius: 100px;
+}
+
+.smartButton div div {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(0.75rem, 0.5567rem + 0.8247vw, 1.5rem);
+  line-height: 1;
+  align-items: center;
+  color: black;
+  font-weight: 600;
+}
+
+.smartButton form {
+}
+
+.smartButton div div button {
+  text-align: left;
+  border-radius: 100px;
+  border: none;
+  font-weight: 600;
+  background: none;
+  color: black;
+  font-size: clamp(1.125rem, 1.0284rem + 0.4124vw, 1.5rem);
+
+  padding: 0.8em;
+  @media (min-width: 45em) {
+    padding: 0.5em;
+  }
+
+  transition: background-color 0.1s linear;
+
+  &:hover {
+    background-color: hsla(358, 0%, 95%, 1);
+  }
+}
+
+.smartButton form:last-child button {
+  text-align: right;
+}
+
+div.dots {
+  bottom: -25px;
+}
+
+div.dots li button::before {
+  width: auto;
+  height: auto;
+  font-size: 0.8rem;
+}
+
+.slider img {
+  object-fit: cover;
+}

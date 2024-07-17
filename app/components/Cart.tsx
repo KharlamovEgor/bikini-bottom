@@ -15,7 +15,7 @@ import {useVariantUrl} from '~/lib/variants';
 import classNames from 'classnames';
 import styles from './Cart.module.css';
 import {Heading} from './Heading/Heading';
-import {BuyCard} from './BuyCard';
+import {BuyCard} from './BuyCard/BuyCard';
 import {ScrollGrid} from './ScrollGrid/ScrollGrid';
 import {Grid} from './Grid/Grid';
 
@@ -101,13 +101,14 @@ function CartLineItem({line}: {line: CartLine}) {
   return (
     <li key={id} className={styles.cartLine}>
       {image && (
-        <Image
-          alt={title}
-          data={image}
-          loading="lazy"
-          width={150}
-          aspectRatio="47/77"
-        />
+        <div className={styles.imageContainer}>
+          <img
+            alt={title}
+            src={image.url}
+            loading="lazy"
+            sizes="(min-width: 720px) 300px, 130px"
+          />
+        </div>
       )}
 
       <div className={styles.cartLineMain}>
@@ -178,20 +179,26 @@ function CartLineRemoveButton({
   );
 }
 
-function CartLineQuantity({line}: {line: CartLine}) {
+export function CartLineQuantity({
+  line,
+  className,
+}: {
+  line: CartLine;
+  className?: string;
+}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
   const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="cart-line-quantity">
+    <div className={classNames('cart-line-quantity', className)}>
       <div className={styles.cartLineButtons}>
         <div className={styles.quatityControll}>
           <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
             <button
               aria-label="Decrease quantity"
-              disabled={quantity <= 1 || !!isOptimistic}
+              disabled={quantity <= 0 || !!isOptimistic}
               name="decrease-quantity"
               value={prevQuantity}
             >
@@ -338,7 +345,7 @@ function UpdateDiscountForm({
   );
 }
 
-function CartLineUpdateButton({
+export function CartLineUpdateButton({
   children,
   lines,
 }: {

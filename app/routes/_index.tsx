@@ -1,18 +1,31 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {Await, Link, useLoaderData, type MetaFunction} from '@remix-run/react';
-import {Suspense, createContext} from 'react';
-import {Pagination, getPaginationVariables} from '@shopify/hydrogen';
-import {Hero} from '~/components/Hero';
+import {
+  Await,
+  useLoaderData,
+  useRouteLoaderData,
+  type MetaFunction,
+} from '@remix-run/react';
+import {Suspense} from 'react';
+import {
+  OptimisticCartLine,
+  Pagination,
+  getPaginationVariables,
+  useOptimisticCart,
+} from '@shopify/hydrogen';
+import {Hero} from '~/components/Hero/Hero';
 import {GiftCard} from '~/components/GiftCard/GiftCard';
 import {Slider} from '~/components/Slider/Slider';
-import {BuyCard} from '~/components/BuyCard';
+import {BuyCard} from '~/components/BuyCard/BuyCard';
 import {
   ALL_PRODUCTS_QUERY,
   COLLECTIONS_QUERY,
-  COLLECTION_QUERY,
   GIFT_CARD_QUERY,
 } from '~/queryes';
 import {Categories} from '~/components/Categories/Categories';
+import {motion} from 'framer-motion';
+import {Preloader} from '~/components/Preloader/Preloader';
+import {RootLoader} from '~/root';
+import {Product} from '~/interfaces/product.interface';
 
 export const meta: MetaFunction = () => {
   return [{title: 'CloClips | Home'}];
@@ -35,18 +48,9 @@ export async function loader(args: LoaderFunctionArgs) {
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   const {storefront} = context;
 
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 8,
-  });
   const variables = getPaginationVariables(request, {
     pageBy: 4,
   });
-
-  const [{collection}] = await Promise.all([
-    storefront.query(COLLECTION_QUERY, {
-      variables: {handle: 'best', ...paginationVariables},
-    }),
-  ]);
 
   const {products} = await context.storefront.query(ALL_PRODUCTS_QUERY, {
     variables,
@@ -59,7 +63,6 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   const {product} = await context.storefront.query(GIFT_CARD_QUERY);
 
   return {
-    bestCollection: collection,
     allProducts: products,
     collections,
     giftCard: product,
@@ -71,76 +74,57 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 }
 
 export default function Homepage() {
-  const {allProducts, bestCollection, collections, giftCard, cart} =
-    useLoaderData<typeof loader>();
+  const {allProducts, collections, giftCard} = useLoaderData<typeof loader>();
+  const rootData = useRouteLoaderData<RootLoader>('root');
   return (
     <div className="home">
       <Slider />
-      <NewCollection products={allProducts} />
-      <BestSellers products={bestCollection} />
+      <Suspense fallback={<NewCollection products={allProducts} />}>
+        <Await resolve={rootData?.cart}>
+          {(cart) => {
+            const fastCart = useOptimisticCart(cart);
+            return (
+              <NewCollection
+                lines={fastCart?.lines.nodes}
+                products={allProducts}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
       <Categories
         collections={collections.nodes.filter(
-          (collection) => collection.title != 'best',
+          (collection) => collection.title != 'Best',
         )}
       />
       <Hero />
-      <GiftCard className="giftCard" product={giftCard} />
+      <Suspense fallback={<GiftCard className="giftCard" product={giftCard} />}>
+        <Await resolve={rootData?.cart}>
+          {(cart) => {
+            const fastCart = useOptimisticCart(cart);
+            return (
+              <GiftCard
+                className="giftCard"
+                product={giftCard}
+                style={{marginBottom: 0}}
+                lines={fastCart?.lines.nodes}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
+      <Preloader />
     </div>
   );
 }
 
-interface Collection {
-  title: string;
-  id: string;
-  onlineStoreUrl: string;
-  products: {
-    edges: Array<{
-      node: {
-        featuredImage: {src: string};
-      };
-    }>;
-  };
-}
-
-//function Categories({
-//  collections,
-//}: {
-//  collections: Promise<{nodes: Array<Collection>}>;
-//}): JSX.Element {
-//  return (
-//    <div className="collections">
-//      <h2 className="new-collection__heading">Categories</h2>
-//      <div className="container collection-grid">
-//        <Suspense fallback={<div>Loading...</div>}>
-//          <Await resolve={collections}>
-//            {(response) => {
-//              const filteredData = response.nodes.filter(
-//                (collection) =>
-//                  collection.title != 'best' && collection.title != 'Home page',
-//              );
-//              return filteredData.map((collection) => (
-//                <Link
-//                  to={collection.onlineStoreUrl}
-//                  className="collection-card"
-//                  key={collection.id}
-//                >
-//                  <div className="collection-card__image">
-//                    <img src={collection?.image?.url} />
-//                  </div>
-//                  <div className="collection-card__data">
-//                    <h4>{collection.title}</h4>
-//                  </div>
-//                </Link>
-//              ));
-//            }}
-//          </Await>
-//        </Suspense>
-//      </div>
-//    </div>
-//  );
-//}
-
-function NewCollection({products}: {products: Promise<any | null>}) {
+function NewCollection({
+  products,
+  lines,
+}: {
+  products: Promise<any | null>;
+  lines: Array<any>;
+}) {
   return (
     <Pagination connection={products}>
       {({nodes, NextLink, isLoading}) => (
@@ -148,40 +132,35 @@ function NewCollection({products}: {products: Promise<any | null>}) {
           <h2 className="new-collection__heading">
             Friends forever collection
           </h2>
-          <div className="new-collection-grid">
-            {nodes?.map((product) => (
-              <BuyCard key={product.id} product={product} />
-            ))}
-          </div>
+          <motion.div layout className="new-collection-grid">
+            {nodes?.map((product: Product) => {
+              if (lines) {
+                const line = lines.find(
+                  (line) => line.merchandise.id == product.variants.nodes[0].id,
+                );
+                return (
+                  <BuyCard line={line} key={product.id} product={product} />
+                );
+              }
+              return <BuyCard key={product.id} product={product} />;
+            })}
+          </motion.div>
           <div className="collection__more">
-            <NextLink>
+            <NextLink
+              onClick={(e) => {
+                e.target.classList.remove('animate');
+
+                e.target.classList.add('animate');
+                setTimeout(function () {
+                  e.target.classList.remove('animate');
+                }, 700);
+              }}
+            >
               {isLoading ? 'Loading...' : 'Load next products'}
             </NextLink>
           </div>
         </>
       )}
     </Pagination>
-  );
-}
-
-function BestSellers({products}: {products: Promise<any | null>}) {
-  return (
-    <div className="recommended-products">
-      <h2 className="recommended-products__heading">Best Sellers</h2>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={products}>
-          {(response) => (
-            <div className="recommended-products-grid">
-              {response
-                ? response.products.nodes.map((product) => (
-                    <BuyCard key={product.id} product={product} />
-                  ))
-                : null}
-            </div>
-          )}
-        </Await>
-      </Suspense>
-      <br />
-    </div>
   );
 }

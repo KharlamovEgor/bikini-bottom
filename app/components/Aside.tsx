@@ -1,8 +1,17 @@
-import {createContext, useContext, useState} from 'react';
+import {createContext, useContext, useEffect, useState} from 'react';
+import StarSrc from '../assets/images/best.png';
 
-export function Aside({children, heading, type}) {
+export function Aside({children, type}) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
+
+  useEffect(() => {
+    if (activeType == 'closed') {
+      document.documentElement.style.overflowY = 'visible';
+    } else {
+      document.documentElement.style.overflowY = 'hidden';
+    }
+  }, [activeType]);
 
   return (
     <div
@@ -13,8 +22,11 @@ export function Aside({children, heading, type}) {
       <button className="close-outside" onClick={close} />
       <aside>
         <header>
-          <h3>{heading}</h3>
-          <button className="close reset" onClick={close}>
+          <button
+            className="close reset"
+            style={{marginTop: '0.5em'}}
+            onClick={close}
+          >
             &times;
           </button>
         </header>
@@ -23,6 +35,8 @@ export function Aside({children, heading, type}) {
     </div>
   );
 }
+
+//<img src={StarSrc} alt="" />
 
 const AsideContext = createContext(null);
 

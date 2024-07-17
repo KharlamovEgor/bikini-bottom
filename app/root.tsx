@@ -16,6 +16,7 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import customStyles from '~/styles/custom.css?url';
 import fontsStyles from '~/styles/fonts.css?url';
+import BrotherFont from '~/assets/fonts/BROTHER-Bold.ttf';
 import {PageLayout} from '~/components/PageLayout';
 import {HEADER_QUERY} from '~/lib/fragments';
 import {PRODUCT_ITEM_FRAGMENT} from './queryes';
@@ -53,6 +54,11 @@ export function links() {
       href: 'https://shop.app',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {
+      rel: 'preload',
+      href: BrotherFont,
+      as: 'font',
+    },
   ];
 }
 
@@ -97,7 +103,6 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
 
   return {
     header,
-    // searchData: searchData.products.nodes,
   };
 }
 
@@ -134,7 +139,10 @@ function Layout({children}: {children?: React.ReactNode}) {
     <html lang="fr">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        {
+          // <meta name="viewport" content="width=device-width,initial-scale=1" />
+        }
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
         <Meta />
         <Links />
       </head>
@@ -150,6 +158,53 @@ function Layout({children}: {children?: React.ReactNode}) {
         ) : (
           children
         )}
+        <div className="wrapper">
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+          <div>
+            <span className="dot"></span>
+          </div>
+        </div>
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>

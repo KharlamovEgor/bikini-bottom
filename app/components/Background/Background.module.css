@@ -1,16 +1,124 @@
-.background {
-  background-image: url('./bg-mobile.png');
-  background-repeat: no-repeat;
+/*.background {*/
+/*  background-image: url('./bg-mobile.png');*/
+/*  background-repeat: no-repeat;*/
+/*  overflow: hidden;*/
+/*  margin: 0 auto;*/
+/*  max-width: 100%;*/
+/*  background-size: 860px;*/
+/*  background-position: 37% top;*/
+/**/
+/*  @media (min-width: 45em) {*/
+/*    background-position: center center;*/
+/*    background-image: url('./bg.png');*/
+/*    max-width: 2200px;*/
+/*    background-size: cover;*/
+/*  }*/
+/*}*/
+
+.wrapper {
   overflow: hidden;
+}
+
+.background {
+  max-width: 375px;
   margin: 0 auto;
-  max-width: 100%;
-  background-size: 860px;
-  background-position: 37% top;
+  position: relative;
 
   @media (min-width: 45em) {
-    background-position: center center;
-    background-image: url('./bg.png');
-    max-width: 2200px;
-    background-size: cover;
+    max-width: 1920px;
+  }
+}
+
+.menuBg .background {
+  max-width: 100%;
+  margin: 0;
+}
+
+.background > img {
+  position: absolute;
+  z-index: -1;
+  animation: flowerRotate 300s linear;
+}
+
+@keyframes flowerRotate {
+  0% {
+    transform: rotate(0) translateX(0) translateY(0);
+  }
+  20% {
+    transform: rotate(90deg) translateX(50%) translateY(50%);
+  }
+  50% {
+    transform: rotate(180deg) translateX(0) translateY(0);
+  }
+  75% {
+    transform: rotate(240deg) translateX(-50%) translateY(-50%);
+  }
+  100% {
+    transform: rotate(360deg) translateX(0) translateY(0);
+  }
+}
+
+.lightBlue {
+  top: -50px;
+  right: -200px;
+
+  @media (max-width: 45em) {
+    top: 50%;
+    right: -250px;
+    width: 520px;
+  }
+}
+
+.red {
+  top: -170px;
+  right: 100px;
+
+  @media (max-width: 45em) {
+    top: 32%;
+    left: -130px;
+    width: 220px;
+  }
+}
+
+.blue {
+  top: -200px;
+  left: 0;
+
+  @media (max-width: 45em) {
+    top: -3%;
+    left: -140px;
+    width: 220px;
+  }
+}
+
+img.green {
+  top: 100px;
+  left: 20px;
+  animation-name: flowerRotateGreen;
+
+  @media (max-width: 45em) {
+    animation-name: flowerRotate;
+    top: 10%;
+    right: -200px;
+    left: initial;
+    width: 290px;
+  }
+}
+
+@keyframes flowerRotateGreen {
+  0% {
+    transform: rotate(0) translateX(0);
+  }
+  20% {
+    transform: rotate(90deg) translateX(50%);
+  }
+  50% {
+    transform: rotate(180deg) translateX(0);
+  }
+  75% {
+    transform: rotate(240deg) translateX(-50%);
+  }
+  100% {
+    transform: rotate(360deg) translateX(0);
   }
 }
