@@ -12,6 +12,8 @@
   transition: all 0.3s ease-out;
   visibility: hidden;
   opacity: 0;
+  height: 125vh;
+  overflow-y: scroll;
 
   @media (max-width: 720px) {
     height: calc(100dvh - 75px);
@@ -75,12 +77,7 @@ div.container {
 .searhGrid {
   display: grid;
   grid-template-columns: repeat(6, min(301px, calc(100% / 6)));
-  overflow-y: auto;
   max-height: 100%;
-
-  @media (min-width: 45em) {
-    max-height: 1180px;
-  }
 }
 
 div.grid {

@@ -3,6 +3,7 @@ import type {CartApiQueryFragment, HeaderQuery} from 'storefrontapi.generated';
 import {Aside} from '~/components/Aside';
 import {Header, HeaderMenu} from '~/components/Header';
 import {Background} from './Background/Background';
+import {Link} from '@remix-run/react';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -48,16 +49,17 @@ function Footer(): JSX.Element {
       <div className="container footer">
         <span>CloClips Shop - 2024</span>
         <div className="footerLinks">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Return Policy</a>
-          <a href="#">Shipping Policy</a>
-          <a href="#">Oferta</a>
+          <Link to="/pages/about-us">About Us</Link>
+          <Link to="/policies/privacy-policy">Privacy Policy</Link>
+          <Link to="/policies/refund-policy">Return Policy</Link>
+          <Link to="/policies/shipping-policy">Shipping Policy</Link>
+          <Link to="/policies/terms-of-service">Oferta</Link>
         </div>
         <div className="footerContacts">
-          <h4>Contact Information</h4>
+          <h4>Contact Us</h4>
           <ul>
             <li>E-mail: maxbobshopify@gmail.com</li>
-            <li>WhatsApp: +66 82 251 3630</li>
+            <li>Phone Number: +375444906872</li>
           </ul>
         </div>
       </div>

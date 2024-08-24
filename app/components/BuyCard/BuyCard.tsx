@@ -45,7 +45,9 @@ export function BuyCard({
         <div className={styles.imageContainer}>
           {product.images.nodes.length > 1 ? (
             <Slider
-              dotsClass={classNames('slick-dots', styles.dots)}
+              dotsClass={classNames('slick-dots', styles.dots, {
+                [styles.smallDots]: mobileSmall,
+              })}
               dots
               infinite
               speed={500}

@@ -45,7 +45,7 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy">
+    <div className="policy container">
       <br />
       <br />
       <div>

@@ -1,6 +1,5 @@
 import {
   CartForm,
-  Image,
   Money,
   useOptimisticCart,
   type OptimisticCart,
@@ -65,9 +64,7 @@ function CartDetails({
           <Link to="/collections/all">Continue shopping →</Link>
         </CartSummary>
         <div className={styles.recommendedProducts}>
-          <Heading className={styles.recommendedHeading}>
-            Recommended products
-          </Heading>
+          <Heading className={styles.recommendedHeading}>Best Sellers</Heading>
           <ScrollGrid>
             {recommended?.map((product) => (
               <BuyCard key={product.id} product={product} small={true} />
@@ -274,7 +271,7 @@ export function CartEmpty({
         Continue shopping
       </Link>
       <div className={styles.recommendedProducts}>
-        <Heading>Recommended products</Heading>
+        <Heading>Best Sellers</Heading>
         <Grid>
           {recommended?.map((product) => {
             return <BuyCard key={product.id} product={product} />;

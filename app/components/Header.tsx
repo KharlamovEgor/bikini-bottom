@@ -189,20 +189,7 @@ export function HeaderMenu({
         </div>
         <span>Accessories</span>
       </Link>
-      <Link
-        className={styles.item}
-        onClick={closeAside}
-        style={{
-          backgroundColor:
-            currentLocation == '/collections/gift-card' ? '#bbbbbb55' : 'white',
-        }}
-        to={'/collections/gift-card'}
-      >
-        <div>
-          <img src={GiftSrc} />
-        </div>
-        <span>Gift cards</span>
-      </Link>
+
       <Link
         className={styles.item}
         onClick={closeAside}
@@ -231,7 +218,21 @@ export function HeaderMenu({
         <div>
           <img src={BestSrc} />
         </div>
-        <span>Best</span>
+        <span>Best Sellers</span>
+      </Link>
+      <Link
+        className={styles.item}
+        onClick={closeAside}
+        style={{
+          backgroundColor:
+            currentLocation == '/collections/gift-card' ? '#bbbbbb55' : 'white',
+        }}
+        to={'/collections/gift-card'}
+      >
+        <div>
+          <img src={GiftSrc} />
+        </div>
+        <span>Gift cards</span>
       </Link>
     </nav>
   );
