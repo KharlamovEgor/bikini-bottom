@@ -7,7 +7,6 @@ import {
 } from '@remix-run/react';
 import {Suspense} from 'react';
 import {
-  OptimisticCartLine,
   Pagination,
   getPaginationVariables,
   useOptimisticCart,
@@ -24,8 +23,10 @@ import {
 import {Categories} from '~/components/Categories/Categories';
 import {motion} from 'framer-motion';
 import {Preloader} from '~/components/Preloader/Preloader';
-import {RootLoader} from '~/root';
-import {Product} from '~/interfaces/product.interface';
+import type {RootLoader} from '~/root';
+import type {Product} from '~/interfaces/product.interface';
+import {ContactForm} from '~/components';
+import {Heading} from '~/components/Heading/Heading';
 
 export const meta: MetaFunction = () => {
   return [{title: 'CloClips | Home'}];
@@ -46,8 +47,6 @@ export async function loader(args: LoaderFunctionArgs) {
 }
 
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
-  const {storefront} = context;
-
   const variables = getPaginationVariables(request, {
     pageBy: 4,
   });
@@ -113,6 +112,7 @@ export default function Homepage() {
           }}
         </Await>
       </Suspense>
+
       <Preloader />
     </div>
   );

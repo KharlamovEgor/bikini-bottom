@@ -36,6 +36,15 @@ export default defineConfig({
        * @see https://vitejs.dev/config/dep-optimization-options
        */
       include: [
+        '@mui/icons-material/ExpandMore',
+        '@mui/system/useThemeWithoutDefault',
+        '@mui/system/createStyled',
+        '@mui/system/colorManipulator',
+        'react-is',
+        'hoist-non-react-statics',
+        'smtpjs',
+        'smtp',
+        'mailslurp-client',
         'fast-deep-equal',
         'react-required-if',
         'clamp',

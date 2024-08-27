@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import styles from './Preloader.module.css';
 import {useEffect, useState} from 'react';
 
-export function Preloader({className}): JSX.Element {
+export function Preloader(): JSX.Element {
   const [isOpened, setIsOpened] = useState(true);
   useEffect(() => {
     setIsOpened(sessionStorage.getItem('isOpened') == 'false' ? false : true);
@@ -19,7 +19,7 @@ export function Preloader({className}): JSX.Element {
 
   return (
     <div
-      className={classNames(styles.preloader, className, {
+      className={classNames(styles.preloader, {
         [styles.hidden]: !isOpened,
       })}
     >
