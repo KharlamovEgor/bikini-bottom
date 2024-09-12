@@ -20,7 +20,8 @@
 .slide::before {
   content: '';
   position: absolute;
-  background-image: url('./patric.png');
+  /*background-image: url('./patric.png');*/
+  background-image: url('./purple-bob.png');
   background-repeat: no-repeat;
   background-size: 900px 900px;
   width: 900px;
@@ -29,12 +30,18 @@
   left: -1.5%;
   transform: translateY(120%);
   z-index: 5;
+  background-size: contain;
+  left: 10%;
+  top: 28%;
+  width: 700px;
+  height: 750px;
 }
 
 .slide::after {
   content: '';
   position: absolute;
-  background-image: url('./spongebob.png');
+  /*background-image: url('./spongebob.png');*/
+  background-image: url('./plakton.png');
   background-repeat: no-repeat;
   background-size: auto 988px;
   width: 988px;
@@ -43,6 +50,10 @@
   right: -7%;
   transform: translateY(120%);
   z-index: 5;
+  background-size: contain;
+  top: 25%;
+  right: -18%;
+  height: 700px;
 }
 
 .slide.animate::before {

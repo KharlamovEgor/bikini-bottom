@@ -135,6 +135,10 @@ export default function Product() {
   const {selectedVariant} = product;
   const rootData = useRouteLoaderData<RootLoader>('root');
 
+  console.log(
+    product.images.nodes.forEach((image) => console.log(image.altText)),
+  );
+
   return (
     <Background>
       <div className={classNames(styles.product, 'container')}>
@@ -192,11 +196,13 @@ export default function Product() {
                   smallImage={{
                     isFluidWidth: true,
                     src: image.url,
+                    alt: image.altText,
                   }}
                   largeImage={{
                     src: image.url,
                     width: 1330,
                     height: 2180,
+                    alt: image.altText,
                   }}
                   lensStyle={{backgroundColor: 'rgba(0,0,0,.6)'}}
                   isHintEnabled={true}
@@ -228,11 +234,13 @@ export default function Product() {
             smallImage={{
               isFluidWidth: true,
               src: product.variants.nodes[0].image.url,
+              alt: product.variants.nodes[0].image.altText,
             }}
             largeImage={{
               src: product.variants.nodes[0].image.url,
               width: 1330,
               height: 2180,
+              alt: product.variants.nodes[0].image.altText,
             }}
             lensStyle={{backgroundColor: 'rgba(0,0,0,.6)'}}
             isHintEnabled={true}

@@ -143,6 +143,7 @@ function Layout({children}: {children?: React.ReactNode}) {
           // <meta name="viewport" content="width=device-width,initial-scale=1" />
         }
         <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <meta name="mailru-domain" content="lT48Yv8AFBSDnpPC" />
         <Meta />
         <Links />
       </head>

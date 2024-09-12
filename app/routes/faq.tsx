@@ -123,6 +123,22 @@ export default function FaqPage() {
           </div>
         </div>
       </div>
+      <div className="faqs__texts">
+        <p>
+          We hope this FAQ section has addressed any questions you may have had.
+        </p>
+        <p>
+          Should you require further assistance or clarification, please don't
+          hesitate to reach out to us.
+        </p>
+        <p>Email: support@cloclips.shop</p>
+        <p>Phone: +375444906872</p>
+        <p>Operating Hours: Monday - Sunday | 10:00 - 18:00 (EST)</p>
+        <p>
+          Your feedback is invaluable to us as we continuously strive to enhance
+          your shopping experience at CloClips.
+        </p>
+      </div>
     </div>
   );
 }

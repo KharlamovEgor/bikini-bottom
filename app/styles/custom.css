@@ -606,6 +606,11 @@ a.product-options-item {
   }
 }
 
+.footerIcons {
+  display: flex;
+  gap: 1em;
+}
+
 .footer__links-block--margin {
   display: flex;
   flex-direction: column;
@@ -651,11 +656,38 @@ a.product-options-item {
 }
 
 .contact-us {
-  margin-top: 10em;
+  margin-top: 5em;
 }
 
 .contact-us h2 {
-  margin-bottom: 1.5em;
+  margin-bottom: 1em;
+}
+
+.contact-us__texts {
+  margin: 0 auto;
+  margin-bottom: 2em;
+  max-width: 70em;
+}
+
+.contact-us__texts a {
+  text-decoration: underline;
+}
+
+.contact-us__texts p {
+  & + p {
+    margin-top: 0.2em;
+  }
+
+  @media (min-width: 45em) {
+    font-size: 1.3rem;
+  }
+}
+
+.contact-us__texts h3 {
+  color: var(--color-dark);
+  @media (min-width: 45em) {
+    font-size: 1.5rem;
+  }
 }
 
 .faqs {
@@ -715,6 +747,20 @@ a.product-options-item {
 }
 
 .faqs__grid-item p {
+  @media (min-width: 45em) {
+    font-size: 1.3rem;
+  }
+}
+
+.faqs__texts {
+  margin-top: 3em;
+}
+
+.faqs__texts p {
+  & + p {
+    margin-top: 0.2em;
+  }
+
   @media (min-width: 45em) {
     font-size: 1.3rem;
   }

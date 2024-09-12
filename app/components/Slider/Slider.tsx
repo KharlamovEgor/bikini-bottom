@@ -6,7 +6,6 @@ import TextSrc from './text.png';
 import TextSrcMobile from './txt-mobile.png';
 import {useEffect, useState} from 'react';
 import classNames from 'classnames';
-import {Image} from '@shopify/hydrogen';
 
 export function Slider({...props}: SliderProps): JSX.Element {
   const [isDuration, setIsDuration] = useState(true);

@@ -7,7 +7,8 @@
 .hero::before {
   content: '';
   position: absolute;
-  background-image: url('./sandy.webp');
+  /*background-image: url('./sandy.webp');*/
+  background-image: url('./sandy-new.png');
   background-repeat: no-repeat;
   background-size: auto 900px;
   width: 900px;
@@ -22,7 +23,8 @@
 .hero::after {
   content: '';
   position: absolute;
-  background-image: url('./patrik.webp');
+  /*background-image: url('./patrik.webp');*/
+  background-image: url('./crabs.png');
   background-repeat: no-repeat;
   background-size: auto 900px;
   width: 900px;

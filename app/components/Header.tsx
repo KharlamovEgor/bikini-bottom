@@ -1,4 +1,4 @@
-import {Await, Link, NavLink, useLocation} from '@remix-run/react';
+import {Await, Link, useLocation} from '@remix-run/react';
 import {type CartViewPayload, useAnalytics} from '@shopify/hydrogen';
 
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
@@ -74,17 +74,12 @@ export function Header({
 
 export function HeaderMenu({
   viewport,
-  primaryDomainUrl,
 }: {
   menu: HeaderProps['header']['menu'];
   primaryDomainUrl: HeaderProps['header']['shop']['primaryDomain']['url'];
   viewport: Viewport;
   publicStoreDomain: HeaderProps['publicStoreDomain'];
 }) {
-  const className = `header-menu-${viewport}`;
-
-  //console.log(primaryDomainUrl);
-
   function closeAside(event: React.MouseEvent<HTMLAnchorElement>) {
     if (viewport === 'mobile') {
       event.preventDefault();
@@ -111,7 +106,7 @@ export function HeaderMenu({
         to={'/'}
       >
         <div>
-          <img src={HomeSrc} />
+          <img src={HomeSrc} alt="home" />
         </div>
         <span>Home</span>
       </Link>
@@ -125,7 +120,7 @@ export function HeaderMenu({
         to={'/collections/all'}
       >
         <div>
-          <img src={AllSrc} />
+          <img src={AllSrc} alt="all" />
         </div>
         <span>Shop All</span>
       </Link>
@@ -141,7 +136,7 @@ export function HeaderMenu({
         to={'/collections/plush-toys'}
       >
         <div>
-          <img src={PlushSrc} />
+          <img src={PlushSrc} alt="plush toys" />
         </div>
         <span>Plush Toys</span>
       </Link>
@@ -155,9 +150,9 @@ export function HeaderMenu({
         to={'/collections/lego'}
       >
         <div>
-          <img src={LegotSrc} />
+          <img src={LegotSrc} alt="constructor" />
         </div>
-        <span>Lego</span>
+        <span>Constructor</span>
       </Link>
       <Link
         className={styles.item}
@@ -169,7 +164,7 @@ export function HeaderMenu({
         to={'/collections/office'}
       >
         <div>
-          <img src={SchoolSrc} />
+          <img src={SchoolSrc} alt="school" />
         </div>
         <span>School</span>
       </Link>
@@ -185,7 +180,7 @@ export function HeaderMenu({
         to={'/collections/accessories'}
       >
         <div>
-          <img src={AccessoriesSrc} />
+          <img src={AccessoriesSrc} alt="accessories" />
         </div>
         <span>Accessories</span>
       </Link>
@@ -202,7 +197,7 @@ export function HeaderMenu({
         to={'/collections/phone-accessories'}
       >
         <div>
-          <img src={PhoneSrc} />
+          <img src={PhoneSrc} alt="phone accessories" />
         </div>
         <span>Phone accessories</span>
       </Link>
@@ -216,7 +211,7 @@ export function HeaderMenu({
         }}
       >
         <div>
-          <img src={BestSrc} />
+          <img src={BestSrc} alt="best sellers" />
         </div>
         <span>Best Sellers</span>
       </Link>
@@ -230,7 +225,7 @@ export function HeaderMenu({
         to={'/collections/gift-card'}
       >
         <div>
-          <img src={GiftSrc} />
+          <img src={GiftSrc} alt="gift cards" />
         </div>
         <span>Gift cards</span>
       </Link>
@@ -310,7 +305,13 @@ function SearchToggle({
   );
 }
 
-function CartLink({setIsOpened, quantity}) {
+function CartLink({
+  setIsOpened,
+  quantity,
+}: {
+  setIsOpened: (...args: any) => void;
+  quantity: number;
+}) {
   const {publish, shop, cart, prevCart} = useAnalytics();
 
   return (
@@ -318,7 +319,7 @@ function CartLink({setIsOpened, quantity}) {
       data-count={quantity}
       className={classNames('cart-button', styles.cartLink)}
       to="/cart"
-      onClick={(e) => {
+      onClick={() => {
         setIsOpened(false);
         publish('cart_viewed', {
           cart,
@@ -332,15 +333,3 @@ function CartLink({setIsOpened, quantity}) {
     </Link>
   );
 }
-//
-//function activeLinkStyle({
-//  isActive,
-//  isPending,
-//}: {
-//  isActive: boolean;
-//  isPending: boolean;
-//}) {
-//  return {
-//    backgroundColor: isActive ? '#bbbbbb55' : 'transparent',
-//  };
-//}
